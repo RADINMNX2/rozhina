@@ -105,6 +105,28 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
+
+  .sheen {
+    @apply relative overflow-hidden;
+  }
+
+  .sheen::before {
+    content: '';
+    @apply pointer-events-none absolute inset-y-0 -left-[80%] w-[55%];
+    background: linear-gradient(
+      105deg,
+      transparent 0%,
+      rgba(226, 201, 151, 0.16) 50%,
+      transparent 100%
+    );
+    transform: skewX(-18deg);
+    transition: transform 0.95s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .sheen:hover::before,
+  .group:hover .sheen::before {
+    transform: translateX(420%) skewX(-18deg);
+  }
 }
 
 @layer utilities {

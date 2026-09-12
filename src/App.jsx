@@ -10,6 +10,8 @@ import { Footer } from './components/Footer';
 import { CartDrawer } from './components/CartDrawer';
 import { SearchOverlay } from './components/SearchOverlay';
 import { FloatingWhatsApp } from './components/FloatingWhatsApp';
+import { ProductQuickViewModal } from './components/ProductQuickViewModal';
+import { CartToast } from './components/CartToast';
 import { PRODUCTS } from './data/productsData';
 
 const getSearchKey = (product) =>
@@ -22,6 +24,7 @@ export default function App() {
   const [color, setColor] = useState(null);
   const [sort, setSort] = useState('featured');
   const [search, setSearch] = useState('');
+  const [quickView, setQuickView] = useState(null);
 
   const products = useMemo(() => {
     let list = [...PRODUCTS];
@@ -68,6 +71,7 @@ export default function App() {
           setColor={setColor}
           sort={sort}
           setSort={setSort}
+          onQuickView={setQuickView}
         />
         <Lookbook />
         <Newsletter />
@@ -82,6 +86,8 @@ export default function App() {
         onSelect={handleSearchSelect}
       />
       <FloatingWhatsApp />
+      <ProductQuickViewModal product={quickView} onClose={() => setQuickView(null)} />
+      <CartToast />
     </div>
   );
 }

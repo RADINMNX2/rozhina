@@ -5,6 +5,7 @@ const CartContext = createContext(null);
 
 export const CartProvider = ({ children }) => {
   const [items, setItems] = useState([]);
+  const [lastAdded, setLastAdded] = useState(null);
 
   const addItem = useCallback((id, qty = 1) => {
     setItems((prev) => {
@@ -17,6 +18,7 @@ export const CartProvider = ({ children }) => {
       const product = PRODUCTS.find((p) => p.id === id);
       return [...prev, { id, qty, colorHex: product?.colors?.[0]?.hex }];
     });
+    setLastAdded({ id, at: Date.now() });
   }, []);
 
   const removeItem = useCallback((id) => {
@@ -61,6 +63,7 @@ export const CartProvider = ({ children }) => {
       items: detail,
       totalItems,
       subtotal,
+      lastAdded,
       addItem,
       removeItem,
       increment,
@@ -68,7 +71,7 @@ export const CartProvider = ({ children }) => {
       setColor,
       clear,
     }),
-    [detail, totalItems, subtotal, addItem, removeItem, increment, decrement, setColor, clear],
+    [detail, totalItems, subtotal, lastAdded, addItem, removeItem, increment, decrement, setColor, clear],
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

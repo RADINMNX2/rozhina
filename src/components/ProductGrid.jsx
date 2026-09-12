@@ -2,7 +2,7 @@ import { SearchX } from 'lucide-react';
 import { RozhinaProductCard } from './RozhinaProductCard';
 import { Stagger, StaggerItem } from './motion/Reveal';
 
-export const ProductGrid = ({ products }) => {
+export const ProductGrid = ({ products, onQuickView }) => {
   if (products.length === 0) {
     return (
       <div className="flex flex-col items-center gap-4 py-20 text-center">
@@ -21,7 +21,7 @@ export const ProductGrid = ({ products }) => {
     <Stagger className="grid grid-cols-2 gap-x-5 gap-y-10 md:gap-x-7 lg:grid-cols-3 md:gap-y-14">
       {products.map((product) => (
         <StaggerItem key={product.id}>
-          <RozhinaProductCard product={product} />
+          <RozhinaProductCard product={product} onQuickView={onQuickView} />
         </StaggerItem>
       ))}
     </Stagger>

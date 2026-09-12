@@ -64,9 +64,9 @@ export default {
           '0%, 100%': { opacity: '0.45', transform: 'scale(1)' },
           '50%': { opacity: '0.85', transform: 'scale(1.07)' },
         },
-        'gold-shimmer': {
-          '0%': { backgroundPosition: '-200% 0' },
-          '100%': { backgroundPosition: '200% 0' },
+        'toast-countdown': {
+          '0%': { width: '100%' },
+          '100%': { width: '0%' },
         },
       },
       animation: {
@@ -77,7 +77,7 @@ export default {
         'badge-pop': 'badge-pop 0.45s cubic-bezier(0.22, 1, 0.36, 1) both',
         'zoom-slow': 'zoom-slow 16s ease-in-out infinite',
         ambient: 'ambient 9s ease-in-out infinite',
-        'gold-shimmer': 'gold-shimmer 2.8s linear infinite',
+        'toast-countdown': 'toast-countdown 3.6s linear forwards',
       },
     },
   },

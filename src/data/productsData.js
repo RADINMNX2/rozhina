@@ -25,6 +25,7 @@ export const PRODUCTS = [
     name: 'شال ابریشم توییل طرح هرمس',
     enName: 'Twilly Silk · Hermès Heritage',
     fabric: 'نخ ابریشم',
+    dimensions: '۶۵×۲۰۰ سانتیمتر',
     colors: [
       { label: 'کرم', hex: '#F3E9DA' },
       { label: 'نسکافه‌ای', hex: '#B08968' },
@@ -42,6 +43,7 @@ export const PRODUCTS = [
     name: 'مینی اسکارف ژاکارد روژینا',
     enName: 'Signature Jacquard Mini Scarf',
     fabric: 'ابریشم ژاکارد',
+    dimensions: '۷۰×۷۰ سانتیمتر',
     colors: [
       { label: 'سبز زمردی', hex: '#14432B' },
       { label: 'کرم', hex: '#F3E9DA' },
@@ -59,6 +61,7 @@ export const PRODUCTS = [
     name: 'شال نخی مزونی وال',
     enName: 'Mousseline Cotton Shawl',
     fabric: 'نخ لنین',
+    dimensions: '۱۴۰×۱۴۰ سانتیمتر',
     colors: [
       { label: 'نسکافه‌ای', hex: '#B08968' },
       { label: 'کرم', hex: '#F3E9DA' },
@@ -76,6 +79,7 @@ export const PRODUCTS = [
     name: 'شال کشمیر و موهر پاییزه',
     enName: 'Cashmere & Mohair Autumn Wrap',
     fabric: 'کشمیر و موهر',
+    dimensions: '۱۴۰×۲۰۰ سانتیمتر',
     colors: [
       { label: 'آجری', hex: '#BC5840' },
       { label: 'نسکافه‌ای', hex: '#B08968' },
@@ -93,6 +97,7 @@ export const PRODUCTS = [
     name: 'کرپ حریر دست‌دوز روژینا',
     enName: 'Hand-Embroidered Silk Crepe',
     fabric: 'کرپ حریر',
+    dimensions: '۹۰×۹۰ سانتیمتر',
     colors: [
       { label: 'مشکی زغالی', hex: '#3C3A39' },
       { label: 'کرم', hex: '#F3E9DA' },
@@ -110,6 +115,7 @@ export const PRODUCTS = [
     name: 'شال ابریشم ژاکارد زمردی',
     enName: 'Emerald Jacquard Silk Shawl',
     fabric: 'ابریشم ژاکارد',
+    dimensions: '۱۴۰×۱۴۰ سانتیمتر',
     colors: [
       { label: 'سبز زمردی', hex: '#14432B' },
       { label: 'مشکی زغالی', hex: '#3C3A39' },

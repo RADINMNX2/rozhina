@@ -10,6 +10,7 @@ export const CollectionSection = ({
   setColor,
   sort,
   setSort,
+  onQuickView,
 }) => (
   <section id="collection" className="relative scroll-mt-20 py-16 md:py-24">
     <div className="pointer-events-none absolute inset-x-0 top-0 h-72 bg-[radial-gradient(ellipse_at_top,rgba(226,201,151,0.04),transparent_65%)]" />
@@ -43,7 +44,7 @@ export const CollectionSection = ({
       </div>
 
       <div className="mt-10 md:mt-12">
-        <ProductGrid products={products} />
+        <ProductGrid products={products} onQuickView={onQuickView} />
       </div>
     </div>
   </section>
