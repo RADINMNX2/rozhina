@@ -16,13 +16,22 @@ const deepMerge = (base, patch) => {
   return patch === undefined ? base : patch;
 };
 
+const backfillShots = (merged) => {
+  const defShots = CONTENT.lookbook?.shots ?? [];
+  const cur = merged.lookbook ?? {};
+  const shots = Array.isArray(cur.shots)
+    ? cur.shots.map((s, i) => (s && !s.src && defShots[i] ? { ...s, src: defShots[i].src } : s))
+    : cur.shots;
+  return { ...merged, lookbook: { ...cur, shots } };
+};
+
 const readInitial = () => {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
       const parsed = JSON.parse(raw);
       if (parsed && typeof parsed === 'object') {
-        return deepMerge(CONTENT, parsed);
+        return backfillShots(deepMerge(CONTENT, parsed));
       }
     }
   } catch {
@@ -49,7 +58,7 @@ export const ContentProvider = ({ children }) => {
   }, []);
 
   const replaceContent = useCallback((patch) => {
-    setContent((prev) => deepMerge(CONTENT, deepMerge(prev, patch)));
+    setContent((prev) => backfillShots(deepMerge(CONTENT, deepMerge(prev, patch))));
   }, []);
 
   const resetContent = useCallback(() => setContent(CONTENT), []);

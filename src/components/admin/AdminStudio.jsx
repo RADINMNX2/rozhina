@@ -1145,7 +1145,7 @@ const CField = ({ label, hint, value, onChange, type = 'text', dir = 'auto' }) =
   </Field>
 );
 
-const CListEditor = ({ items, onList, fields }) => {
+const CListEditor = ({ items, onList, fields, imageKey }) => {
   const move = (i, d) => {
     const next = [...items];
     const j = i + d;
@@ -1154,54 +1154,123 @@ const CListEditor = ({ items, onList, fields }) => {
     onList(next);
   };
 
+  const setField = (i, key, value) =>
+    onList(items.map((it, x) => (x === i ? { ...it, [key]: value } : it)));
+
   return (
     <div className="space-y-2.5">
-      {items.map((item, i) => (
-        <div key={i} className="rounded-xl border border-white/[0.07] bg-white/[0.02] p-3">
-          <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
-            {fields.map((f) => (
-              <Field key={f.key} label={f.label}>
-                <TextInput
-                  value={item?.[f.key] ?? ''}
-                  onChange={(e) =>
-                    onList(items.map((it, x) => (x === i ? { ...it, [f.key]: e.target.value } : it)))
-                  }
-                  dir={f.dir ?? 'rtl'}
-                  placeholder={f.placeholder}
-                />
-              </Field>
-            ))}
+      {items.map((item, i) => {
+        const img = item?.[imageKey]?.trim() ?? '';
+        return (
+          <div key={i} className="rounded-xl border border-white/[0.07] bg-white/[0.02] p-3">
+            {imageKey && (
+              <div className="mb-3 flex items-start gap-3 rounded-xl border border-white/[0.06] bg-white/[0.02] p-2.5">
+                <div className="relative aspect-[3/4] w-16 shrink-0 overflow-hidden rounded-lg border border-white/10 bg-white/[0.03]">
+                  {img ? (
+                    <img
+                      src={img}
+                      alt=""
+                      loading="lazy"
+                      className="absolute inset-0 h-full w-full object-cover"
+                      onError={(e) => {
+                        e.currentTarget.style.opacity = 0.15;
+                      }}
+                    />
+                  ) : (
+                    <div className="absolute inset-0 flex items-center justify-center text-taupe/50">
+                      <ImageIcon size={16} strokeWidth={1.5} />
+                    </div>
+                  )}
+                  {img.startsWith('data:image') && (
+                    <span className="absolute bottom-1 right-1 rounded-full bg-obsidian/80 px-1.5 py-0.5 text-[8px] font-bold text-taupe backdrop-blur-md">
+                      آپلود‌شده
+                    </span>
+                  )}
+                </div>
+                <div className="flex flex-1 flex-col gap-2">
+                  <label className="relative cursor-pointer">
+                    <span className="flex items-center justify-center gap-1.5 rounded-xl border border-gold/25 bg-gold/10 px-3 py-2 text-[10px] font-extrabold text-gold transition-colors hover:bg-gold/20 active:scale-[0.98]">
+                      <Upload size={11} strokeWidth={2.2} />
+                      آپلود عکس
+                    </span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="pointer-events-none absolute h-0 w-0 opacity-0"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          if (file.size > 2.5 * 1024 * 1024) {
+                            window.alert('حجم عکس بیشتر از ۲.۵ مگابایت است.');
+                          } else {
+                            readFileAsDataURL(file).then((url) => setField(i, imageKey, url));
+                          }
+                        }
+                        e.target.value = '';
+                      }}
+                    />
+                  </label>
+                  <TextInput
+                    value={item?.[imageKey] ?? ''}
+                    onChange={(e) => setField(i, imageKey, e.target.value)}
+                    dir="ltr"
+                    placeholder="https://… (لینک عکس یا آپلود)"
+                  />
+                  {img && (
+                    <button
+                      type="button"
+                      onClick={() => setField(i, imageKey, '')}
+                      className="self-start rounded-lg border border-white/10 px-2.5 py-1.5 text-[10px] font-bold text-taupe/70 transition-colors hover:border-white/30 hover:text-pearl"
+                    >
+                      پاک کردن تصویر
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
+            <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+              {fields.map((f) => (
+                <Field key={f.key} label={f.label}>
+                  <TextInput
+                    value={item?.[f.key] ?? ''}
+                    onChange={(e) => setField(i, f.key, e.target.value)}
+                    dir={f.dir ?? 'rtl'}
+                    placeholder={f.placeholder}
+                  />
+                </Field>
+              ))}
+            </div>
+            <div className="mt-2.5 flex items-center gap-1.5">
+              <button
+                type="button"
+                aria-label="بالا بردن"
+                disabled={i === 0}
+                onClick={() => move(i, -1)}
+                className="lux-chip !px-2.5 !py-1.5 disabled:opacity-30"
+              >
+                <ChevronUp size={12} />
+              </button>
+              <button
+                type="button"
+                aria-label="پایین بردن"
+                disabled={i === items.length - 1}
+                onClick={() => move(i, 1)}
+                className="lux-chip !px-2.5 !py-1.5 disabled:opacity-30"
+              >
+                <ChevronDown size={12} />
+              </button>
+              <button
+                type="button"
+                aria-label="حذف مورد"
+                onClick={() => onList(items.filter((_, x) => x !== i))}
+                className="lux-chip !px-2.5 !py-1.5 hover:!border-terracotta/40 hover:!text-[#F0A888]"
+              >
+                <Trash2 size={12} />
+              </button>
+            </div>
           </div>
-          <div className="mt-2.5 flex items-center gap-1.5">
-            <button
-              type="button"
-              aria-label="بالا بردن"
-              disabled={i === 0}
-              onClick={() => move(i, -1)}
-              className="lux-chip !px-2.5 !py-1.5 disabled:opacity-30"
-            >
-              <ChevronUp size={12} />
-            </button>
-            <button
-              type="button"
-              aria-label="پایین بردن"
-              disabled={i === items.length - 1}
-              onClick={() => move(i, 1)}
-              className="lux-chip !px-2.5 !py-1.5 disabled:opacity-30"
-            >
-              <ChevronDown size={12} />
-            </button>
-            <button
-              type="button"
-              aria-label="حذف مورد"
-              onClick={() => onList(items.filter((_, x) => x !== i))}
-              className="lux-chip !px-2.5 !py-1.5 hover:!border-terracotta/40 hover:!text-[#F0A888]"
-            >
-              <Trash2 size={12} />
-            </button>
-          </div>
-        </div>
-      ))}
+        );
+      })}
       <button
         type="button"
         onClick={() => onList([...items, {}])}
@@ -1361,11 +1430,16 @@ const ContentTab = ({ pushRef }) => {
           </div>
         </div>
         <div className="mt-4">
-          <Sub label="سبک‌های لوک‌بوک" />
+          <Sub label="سبک‌های لوک‌بوک (عکس + متن)" />
+          <p className="mb-2.5 rounded-xl border border-white/[0.06] bg-white/[0.02] px-4 py-3 text-[11px] leading-6 text-taupe">
+            برای هر استایل می‌توانید عکس آپلود کنید یا لینک آن را وارد کنید. اگر عکسی نباشد، تصویر
+            پیش‌فرض نمایش داده می‌شود و عنوان و زیرعنوان نیز قابل تغییرند.
+          </p>
           <div className="mt-2.5">
             <CListEditor
               items={content.lookbook?.shots ?? []}
               onList={(next) => set('lookbook', { ...content.lookbook, shots: next })}
+              imageKey="src"
               fields={[
                 { key: 'label', label: 'عنوان استایل' },
                 { key: 'sub', label: 'زیرعنوان' },

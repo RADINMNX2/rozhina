@@ -50,7 +50,7 @@ export const Lookbook = () => {
             >
               <div className="aspect-[3/4] overflow-hidden will-change-transform">
                 <img
-                  src={SHOT_IMAGES[i % SHOT_IMAGES.length]}
+                  src={shot.src || SHOT_IMAGES[i % SHOT_IMAGES.length]}
                   alt={shot.label}
                   loading="lazy"
                   className="h-full w-full object-cover brightness-[0.85] transition-transform duration-[1200ms] ease-out group-hover:scale-[1.05]"
