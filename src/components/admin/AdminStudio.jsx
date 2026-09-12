@@ -311,6 +311,15 @@ const EMPTY_DRAFT = {
   images: ['', ''],
 };
 
+/* ---------------- image upload ---------------- */
+const readFileAsDataURL = (file) =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(new Error('read failed'));
+    reader.readAsDataURL(file);
+  });
+
 const ProductEditor = ({ product, onClose, onSave }) => {
   const [draft, setDraft] = useState(() =>
     product
@@ -370,37 +379,53 @@ const ProductEditor = ({ product, onClose, onSave }) => {
 
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.96, y: 16 }}
-      animate={{ opacity: 1, scale: 1, y: 0 }}
-      exit={{ opacity: 0, scale: 0.96, y: 16 }}
-      transition={{ type: 'spring', damping: 26, stiffness: 280 }}
-      className="qvs-sheet fixed inset-0 z-[96] flex items-end justify-center overflow-y-auto md:items-center md:p-6"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-[96] flex items-end justify-center md:items-center md:p-6"
       role="dialog"
       aria-modal="true"
       aria-label={product ? `ویرایش ${product.name}` : 'افزودن محصول جدید'}
       onClick={onClose}
     >
-      <div className="absolute inset-0 bg-obsidian/80 backdrop-blur-md" />
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="absolute inset-0 bg-obsidian/85 backdrop-blur-lg"
+      />
       <motion.div
         onClick={(e) => e.stopPropagation()}
-        className="relative w-full max-w-3xl overflow-hidden rounded-t-3xl border border-white/10 bg-[#100F0E] shadow-[0_25px_60px_rgba(0,0,0,0.9)] md:rounded-3xl"
+        initial={{ opacity: 0, y: 40, scale: 0.98 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: 40, scale: 0.98 }}
+        transition={{ type: 'spring', damping: 30, stiffness: 320 }}
+        className="relative flex max-h-full w-full flex-col overflow-hidden rounded-t-3xl border border-white/10 bg-[#121110] shadow-[0_40px_120px_-20px_rgba(0,0,0,0.95)] md:max-h-[92dvh] md:rounded-[2rem]"
       >
-        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-white/[0.06] bg-[#100F0E]/95 px-5 py-4 backdrop-blur-xl">
-          <h3 className="flex items-center gap-2 text-sm font-extrabold text-pearl">
-            <Package size={15} className="text-gold" strokeWidth={1.7} />
-            {product ? 'ویرایش محصول' : 'افزودن محصول جدید'}
-          </h3>
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-40 rounded-t-[inherit] bg-[radial-gradient(120%_80%_at_50%_-10%,rgba(226,201,151,0.16),transparent_60%)]" />
+        <div className="relative z-10 flex shrink-0 items-center justify-between border-b border-white/[0.06] bg-gradient-to-b from-white/[0.045] to-transparent px-5 pb-4 pt-[max(1rem,env(safe-area-inset-top))]">
+          <div className="flex items-center gap-3">
+            <span className="flex h-10 w-10 items-center justify-center rounded-2xl border border-gold/25 bg-gold/10 text-gold shadow-[0_0_24px_-6px_rgba(226,201,151,0.55)]">
+              <Package size={17} strokeWidth={1.7} />
+            </span>
+            <div>
+              <h3 className="text-sm font-extrabold text-pearl">{product ? 'ویرایش محصول' : 'افزودن محصول جدید'}</h3>
+              <p className="mt-0.5 text-[10px] font-medium text-taupe">
+                {product ? product.enName || product.fabric : 'کالکشن جدید روژینا'}
+              </p>
+            </div>
+          </div>
           <button
             type="button"
             aria-label="بستن"
             onClick={onClose}
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 text-pearl/70 transition-all duration-300 hover:rotate-90 hover:border-gold/40 hover:text-gold active:scale-90"
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] text-pearl/70 transition-all duration-300 hover:rotate-90 hover:border-gold/40 hover:bg-gold/10 hover:text-gold active:scale-90"
           >
             <X size={16} strokeWidth={1.8} />
           </button>
         </div>
 
-        <div className="max-h-[calc(90dvh-4rem)] space-y-5 overflow-y-auto px-5 py-5">
+        <div className="relative flex-1 space-y-6 overflow-y-auto overscroll-contain px-5 py-5">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Field label="عنوان محصول *">
               <TextInput
@@ -494,33 +519,85 @@ const ProductEditor = ({ product, onClose, onSave }) => {
             </Field>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {[0, 1].map((i) => (
-              <Field key={i} label={i === 0 ? 'آدرس عکس اصلی' : 'آدرس عکس استایل (مدل)'}>
-                <div className="flex items-center gap-2.5">
-                  <TextInput
-                    value={draft.images[i]}
-                    onChange={(e) => setImage(i, e.target.value)}
-                    placeholder="https://…"
-                    dir="ltr"
-                  />
-                  <span className="relative h-16 w-12 shrink-0 overflow-hidden rounded-lg border border-white/10 bg-white/[0.03]">
-                    {draft.images[i]?.trim() ? (
-                      <img
-                        src={draft.images[i]}
-                        alt=""
-                        loading="lazy"
-                        className="absolute inset-0 h-full w-full object-cover"
-                        onError={(e) => {
-                          e.currentTarget.src = draft.images[i === 0 ? 1 : 0];
-                        }}
-                      />
-                    ) : (
-                      <ImageIcon size={14} className="absolute inset-0 m-auto text-taupe/50" />
-                    )}
+              <div key={i} className="overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.02]">
+                <div className="relative aspect-[4/3] overflow-hidden bg-white/[0.03]">
+                  {draft.images[i]?.trim() ? (
+                    <img
+                      src={draft.images[i]}
+                      alt=""
+                      loading="lazy"
+                      className="absolute inset-0 h-full w-full object-cover"
+                      onError={(e) => {
+                        e.currentTarget.src = draft.images[i === 0 ? 1 : 0];
+                      }}
+                    />
+                  ) : (
+                    <div className="absolute inset-0 flex flex-col items-center justify-center gap-2.5 text-taupe/60">
+                      <span className="flex h-12 w-12 items-center justify-center rounded-2xl border border-dashed border-white/15">
+                        <ImageIcon size={20} strokeWidth={1.5} />
+                      </span>
+                      <span className="text-[10px] font-bold">عکسی انتخاب نشده</span>
+                    </div>
+                  )}
+                  <span className="absolute left-2.5 top-2.5 rounded-full bg-obsidian/70 px-2.5 py-1 text-[9px] font-extrabold text-gold backdrop-blur-md">
+                    {i === 0 ? 'عکس اصلی' : 'استایل / مدل'}
                   </span>
+                  {draft.images[i]?.trim() && (
+                    <button
+                      type="button"
+                      aria-label="حذف عکس"
+                      onClick={() => setImage(i, '')}
+                      className="absolute right-2.5 top-2.5 flex h-7 w-7 items-center justify-center rounded-full bg-obsidian/70 text-pearl/80 backdrop-blur-md transition-colors hover:text-terracotta"
+                    >
+                      <X size={12} strokeWidth={2.2} />
+                    </button>
+                  )}
+                  {draft.images[i]?.startsWith('data:image') && (
+                    <span className="absolute bottom-2.5 right-2.5 rounded-full bg-obsidian/70 px-2 py-0.5 text-[8px] font-bold text-taupe backdrop-blur-md">
+                      آپلود‌شده
+                    </span>
+                  )}
                 </div>
-              </Field>
+                <div className="flex items-center gap-2 p-2.5">
+                  <label className="relative flex-1 cursor-pointer">
+                    <span className="flex items-center justify-center gap-1.5 rounded-xl border border-gold/25 bg-gold/10 px-3 py-2 text-[11px] font-extrabold text-gold transition-colors hover:bg-gold/20 active:scale-[0.98]">
+                      <Upload size={12} strokeWidth={2.2} />
+                      آپلود عکس
+                    </span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="pointer-events-none absolute h-0 w-0 opacity-0"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          if (file.size > 2.5 * 1024 * 1024) {
+                            window.alert('حجم عکس بیشتر از ۲.۵ مگابایت است.');
+                          } else {
+                            readFileAsDataURL(file).then((url) => setImage(i, url));
+                          }
+                        }
+                        e.target.value = '';
+                      }}
+                    />
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => setImage(i, '')}
+                    className="shrink-0 rounded-xl border border-white/10 px-3 py-2 text-[11px] font-bold text-taupe/70 transition-colors hover:border-white/30 hover:text-pearl"
+                  >
+                    پاک‌کردن
+                  </button>
+                </div>
+                <TextInput
+                  value={draft.images[i]}
+                  onChange={(e) => setImage(i, e.target.value)}
+                  placeholder="یا لینک تصویر: https://…"
+                  dir="ltr"
+                />
+              </div>
             ))}
           </div>
 
@@ -651,28 +728,33 @@ const ProductEditor = ({ product, onClose, onSave }) => {
           </Field>
 
           {error && (
-            <p className="rounded-xl border border-terracotta/40 bg-terracotta/10 px-4 py-2.5 text-xs font-bold text-[#F0A888]">
+            <motion.p
+              initial={{ opacity: 0, y: -6 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex items-center gap-2 rounded-2xl border border-terracotta/40 bg-terracotta/10 px-4 py-3 text-xs font-bold text-[#F0A888]"
+            >
+              <X size={12} strokeWidth={2.5} />
               {error}
-            </p>
+            </motion.p>
           )}
+        </div>
 
-          <div className="flex flex-col gap-2.5 pb-[max(1rem,env(safe-area-inset-bottom))] pt-1 sm:flex-row sm:justify-end sm:pb-1">
-            <button
-              type="button"
-              onClick={onClose}
-              className={`${PILL_BTN} border-white/10 text-pearl/60 hover:border-white/30 hover:text-pearl`}
-            >
-              انصراف
-            </button>
-            <button
-              type="button"
-              onClick={save}
-              className={`${PILL_BTN} btn-gold-modern !px-6 !py-2.5 !text-xs`}
-            >
-              <Save size={13} strokeWidth={2} />
-              ذخیرهٔ محصول
-            </button>
-          </div>
+        <div className="relative z-10 flex shrink-0 items-center gap-2.5 border-t border-white/[0.06] bg-gradient-to-t from-[#0E0D0C] to-[#141312] px-5 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3 backdrop-blur-xl">
+          <button
+            type="button"
+            onClick={onClose}
+            className={`${PILL_BTN} flex-1 border-white/10 bg-white/[0.03] text-pearl/70 hover:border-white/30 hover:text-pearl sm:flex-none`}
+          >
+            انصراف
+          </button>
+          <button
+            type="button"
+            onClick={save}
+            className="btn-gold-modern flex-1 !rounded-full !px-6 !py-3 !text-xs sm:flex-none sm:!px-10 sm:!py-3"
+          >
+            <Save size={14} strokeWidth={2} />
+            ذخیرهٔ محصول
+          </button>
         </div>
       </motion.div>
     </motion.div>
@@ -680,43 +762,51 @@ const ProductEditor = ({ product, onClose, onSave }) => {
 };
 
 /* ---------------- confirm dialog ---------------- */
-const ConfirmDialog = ({ title, message, confirmLabel = 'حذف شود', onCancel, onConfirm }) => (
+const ConfirmDialog = ({ title, message, confirmLabel = 'تأیید شود', onCancel, onConfirm }) => (
   <motion.div
     initial={{ opacity: 0 }}
     animate={{ opacity: 1 }}
     exit={{ opacity: 0 }}
-    className="fixed inset-0 z-[97] flex items-center justify-center bg-obsidian/80 p-4 backdrop-blur-md"
+    className="fixed inset-0 z-[97] flex items-end justify-center bg-obsidian/85 p-0 backdrop-blur-md sm:items-center sm:p-4"
     onClick={onCancel}
   >
     <motion.div
-      initial={{ opacity: 0, scale: 0.94, y: 12 }}
+      initial={{ opacity: 0, scale: 0.96, y: 24 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
-      exit={{ opacity: 0, scale: 0.94, y: 12 }}
-      transition={{ type: 'spring', damping: 26, stiffness: 300 }}
+      exit={{ opacity: 0, scale: 0.96, y: 24 }}
+      transition={{ type: 'spring', damping: 28, stiffness: 300 }}
       onClick={(e) => e.stopPropagation()}
-      className="w-full max-w-sm rounded-3xl border border-white/10 bg-[#131110] p-6 text-center shadow-[0_25px_60px_rgba(0,0,0,0.85)]"
+      className="relative w-full max-w-sm overflow-hidden rounded-t-3xl border border-white/10 bg-[#141211] pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-7 text-center shadow-[0_40px_120px_-20px_rgba(0,0,0,0.95)] sm:rounded-3xl"
     >
-      <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-full border border-terracotta/30 bg-terracotta/10 text-terracotta">
-        <Trash2 size={18} strokeWidth={1.7} />
-      </span>
-      <h3 className="mt-4 text-base font-extrabold text-pearl">{title}</h3>
-      <p className="mt-2 text-xs leading-6 text-taupe">{message}</p>
-      <div className="mt-6 flex flex-col gap-2.5 sm:flex-row sm:justify-center">
-        <button
-          type="button"
-          onClick={onCancel}
-          className={`${PILL_BTN} border-white/10 text-pearl/60 hover:border-white/30 hover:text-pearl`}
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-[radial-gradient(120%_80%_at_50%_-20%,rgba(212,96,63,0.18),transparent_60%)]" />
+      <div className="relative px-6">
+        <motion.span
+          initial={{ scale: 0.6, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ delay: 0.08, type: 'spring', damping: 18, stiffness: 300 }}
+          className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-terracotta/30 bg-gradient-to-b from-terracotta/20 to-terracotta/5 text-terracotta shadow-[0_16px_40px_-16px_rgba(188,88,64,0.8)]"
         >
-          انصراف
-        </button>
-        <button
-          type="button"
-          onClick={onConfirm}
-          className="flex items-center justify-center gap-2 rounded-full border border-terracotta/50 bg-gradient-to-b from-[#D4603F] to-[#A03F22] px-5 py-2.5 text-xs font-extrabold text-[#FFE8DD] shadow-[0_12px_30px_-12px_rgba(188,88,64,0.6)] transition-all duration-300 hover:-translate-y-0.5 active:scale-[0.97]"
-        >
-          <Trash2 size={13} strokeWidth={2.2} />
-          {confirmLabel}
-        </button>
+          <Trash2 size={20} strokeWidth={1.7} />
+        </motion.span>
+        <h3 className="mt-4 text-base font-extrabold text-pearl">{title}</h3>
+        <p className="mx-auto mt-2 max-w-xs text-xs leading-6 text-taupe">{message}</p>
+        <div className="mx-auto mt-6 flex max-w-xs flex-col gap-2.5 sm:flex-row">
+          <button
+            type="button"
+            onClick={onCancel}
+            className={`${PILL_BTN} flex-1 border-white/10 bg-white/[0.03] text-pearl/70 hover:border-white/30 hover:text-pearl`}
+          >
+            انصراف
+          </button>
+          <button
+            type="button"
+            onClick={onConfirm}
+            className="flex flex-1 items-center justify-center gap-2 rounded-full bg-gradient-to-b from-[#D4603F] to-[#A03F22] px-5 py-2.5 text-xs font-extrabold text-[#FFE8DD] shadow-[0_14px_36px_-14px_rgba(188,88,64,0.9)] transition-all duration-300 hover:-translate-y-0.5 active:scale-[0.97]"
+          >
+            <Trash2 size={13} strokeWidth={2.2} />
+            {confirmLabel}
+          </button>
+        </div>
       </div>
     </motion.div>
   </motion.div>
