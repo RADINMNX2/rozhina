@@ -158,6 +158,8 @@ export const serializeConstants = (s) => [
   `export const PHONE_NUMBER = ${q(s.phone)};`,
   '',
   `export const SUPPORT_ID = ${q(s.supportId)};`,
+  '',
+  `export const PAYMENT_URL = ${q(s.paymentUrl)};`,
 ].join('\n');
 
 export const serializeContent = (c) =>
@@ -1102,6 +1104,14 @@ const SettingsTab = ({ pushRef }) => {
           </Field>
           <Field label="آیدی پشتیبانی">
             <TextInput value={draft.supportId} onChange={(e) => set('supportId', e.target.value)} dir="ltr" />
+          </Field>
+          <Field label="آدرس درگاه پرداخت 🛡️" hint="آدرس Worker کلادفلر بعد از استقرار، مثل https://rozhina-pay.اسم-شما.workers.dev — تا زمانی که خالی باشد، دکمه پرداخت آنلاین نمایش داده نمی‌شود">
+            <TextInput
+              value={draft.paymentUrl}
+              onChange={(e) => set('paymentUrl', e.target.value)}
+              placeholder="https://rozhina-pay…workers.dev"
+              dir="ltr"
+            />
           </Field>
           <Field label="آیدی اینستاگرام">
             <TextInput

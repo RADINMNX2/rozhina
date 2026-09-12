@@ -1,0 +1,12 @@
+name = "rozhina-pay"
+main = "index.js"
+compatibility_date = "2024-11-01"
+
+# =====================================================
+# NON-SECRET configuration (safe to commit)
+#  - The idpay ACTIVATION CODE stays SECRET:
+#    run:  npx wrangler secret put IDPAY_API_KEY
+# =====================================================
+[vars]
+WHATSAPP_NUMBER = "989000000000"
+SHOP_NAME = "روژینا بوتیک"

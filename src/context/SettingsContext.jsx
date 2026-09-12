@@ -4,6 +4,7 @@ import {
   FREE_SHIPPING_THRESHOLD,
   INSTAGRAM_HANDLE,
   INSTAGRAM_URL,
+  PAYMENT_URL,
   PHONE_NUMBER,
   SUPPORT_ID,
   WHATSAPP_NUMBER,
@@ -18,6 +19,7 @@ export const DEFAULT_SETTINGS = {
   instagramHandle: INSTAGRAM_HANDLE,
   instagramUrl: INSTAGRAM_URL,
   supportId: SUPPORT_ID,
+  paymentUrl: PAYMENT_URL,
 };
 
 const SettingsContext = createContext(null);
@@ -29,7 +31,7 @@ export const SettingsProvider = ({ children }) => {
     let alive = true;
     fetchRemoteJs(
       'src/data/constants.js',
-      '({ whatsapp: WHATSAPP_NUMBER, instagramHandle: INSTAGRAM_HANDLE, instagramUrl: INSTAGRAM_URL, freeShippingThreshold: FREE_SHIPPING_THRESHOLD, announcementText: ANNOUNCEMENT_TEXT, phone: PHONE_NUMBER, supportId: SUPPORT_ID })',
+      '({ whatsapp: WHATSAPP_NUMBER, instagramHandle: INSTAGRAM_HANDLE, instagramUrl: INSTAGRAM_URL, freeShippingThreshold: FREE_SHIPPING_THRESHOLD, announcementText: ANNOUNCEMENT_TEXT, phone: PHONE_NUMBER, supportId: SUPPORT_ID, paymentUrl: PAYMENT_URL })',
     )
       .then((remote) => {
         if (!alive) return;

@@ -11,3 +11,5 @@ export const ANNOUNCEMENT_TEXT = "ارسال رایگان به سراسر کشو
 export const PHONE_NUMBER = "09363204121";
 
 export const SUPPORT_ID = "@diakodfrr";
+
+export const PAYMENT_URL = "";
