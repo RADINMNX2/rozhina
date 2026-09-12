@@ -1,14 +1,12 @@
 import { useState } from 'react';
-import { Eye, Heart, Plus } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Check, Eye, Heart, ShoppingBag } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { badgeStyle } from '../data/productsData';
 import { formatPrice, toFa } from '../utils/format';
 import { withImageFallback } from '../utils/imageFallback';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import { SpotlightCard } from './SpotlightCard';
-
-const TILT_SPRING = { type: 'spring', stiffness: 150, damping: 16, mass: 0.5 };
 
 export const RozhinaProductCard = ({ product, onQuickView }) => {
   const { addItem } = useCart();
@@ -20,7 +18,7 @@ export const RozhinaProductCard = ({ product, onQuickView }) => {
     e.stopPropagation();
     addItem(product.id);
     setAdded(true);
-    window.setTimeout(() => setAdded(false), 1400);
+    window.setTimeout(() => setAdded(false), 1600);
   };
 
   const handleWishlist = (e) => {
@@ -100,24 +98,44 @@ export const RozhinaProductCard = ({ product, onQuickView }) => {
             <Eye size={16} strokeWidth={1.8} />
           </button>
 
-          <div className="absolute inset-x-0 bottom-0 translate-y-full opacity-0 transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-y-0 group-hover:opacity-100 max-sm:translate-y-0 max-sm:opacity-100 z-[2]">
+          {/* Modern add-to-cart pill */}
+          <div className="absolute inset-x-0 bottom-0 z-[2] flex justify-center px-3 pb-3 opacity-0 translate-y-3 transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-y-0 group-hover:opacity-100 max-sm:translate-y-0 max-sm:opacity-100">
             <button
               type="button"
+              aria-label={`افزودن ${product.name} به سبد خرید`}
               onClick={handleQuickAdd}
-              className={`flex w-full items-center justify-center gap-2 rounded-b-2xl py-3.5 text-sm font-bold backdrop-blur-xl transition-all duration-300 active:scale-[0.99] ${
-                added
-                  ? 'bg-gradient-to-b from-gold to-bronze text-obsidian shadow-gold-cta'
-                  : 'border-t border-white/10 bg-obsidian/80 text-pearl hover:bg-obsidian/90'
-              }`}
+              className="btn-gold-modern w-full !rounded-full !px-5 !py-3 !text-xs"
             >
-              {added ? (
-                'به سبد اضافه شد ✓'
-              ) : (
-                <>
-                  <Plus size={15} strokeWidth={2.5} aria-hidden />
-                  افزودن سریع
-                </>
-              )}
+              <AnimatePresence mode="wait" initial={false}>
+                {added ? (
+                  <motion.span
+                    key="added"
+                    initial={{ scale: 0.7, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 0.7, opacity: 0 }}
+                    transition={{ type: 'spring', stiffness: 420, damping: 18 }}
+                    className="flex items-center justify-center gap-2"
+                  >
+                    <Check size={15} strokeWidth={3} />
+                    به سبد اضافه شد
+                  </motion.span>
+                ) : (
+                  <motion.span
+                    key="add"
+                    initial={{ scale: 0.92, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 0.92, opacity: 0 }}
+                    transition={{ type: 'spring', stiffness: 420, damping: 18 }}
+                    className="flex items-center justify-center gap-2"
+                  >
+                    <ShoppingBag size={15} strokeWidth={2.2} />
+                    افزودن به سبد
+                    <span className="whitespace-nowrap rounded-full bg-obsidian/25 px-2 py-0.5 text-[10px] font-bold tracking-wide">
+                      {formatPrice(product.price)}
+                    </span>
+                  </motion.span>
+                )}
+              </AnimatePresence>
             </button>
           </div>
         </div>
