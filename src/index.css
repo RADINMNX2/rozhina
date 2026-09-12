@@ -1,0 +1,73 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-alabaster font-sans text-espresso antialiased;
+    text-rendering: optimizeLegibility;
+    font-feature-settings: 'ss01';
+  }
+
+  ::selection {
+    @apply bg-gold/40 text-espresso;
+  }
+
+  button {
+    cursor: pointer;
+  }
+}
+
+@layer components {
+  .container-lux {
+    @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-10;
+  }
+
+  .eyebrow {
+    @apply font-serif text-[10px] font-semibold uppercase tracking-widest2 text-gold;
+  }
+
+  .lux-link {
+    @apply relative text-sm font-medium text-espresso/75 transition-colors duration-300 hover:text-espresso;
+  }
+
+  .lux-link::after {
+    content: '';
+    @apply absolute -bottom-1 right-0 h-px w-0 bg-gold transition-all duration-300 ease-out;
+  }
+
+  .lux-link:hover::after {
+    @apply w-full;
+  }
+
+  .btn-gold {
+    @apply inline-flex items-center justify-center gap-2 bg-gold px-8 py-4 text-sm font-bold tracking-wide text-espresso transition-all duration-500 hover:-translate-y-0.5 hover:bg-espresso hover:text-gold hover:shadow-[0_18px_40px_-12px_rgba(28,25,23,0.5)];
+  }
+
+  .btn-outline {
+    @apply inline-flex items-center justify-center gap-2 border border-espresso/25 px-8 py-4 text-sm font-semibold text-espresso transition-all duration-500 hover:border-espresso hover:bg-espresso hover:text-alabaster;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .lux-input {
+    @apply w-full border border-espresso/15 bg-alabaster px-4 py-3 text-sm text-espresso outline-none transition-colors duration-300 placeholder:text-taupe/70 focus:border-gold;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
