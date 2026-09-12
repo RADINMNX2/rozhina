@@ -21,7 +21,7 @@ import { useProducts } from '../../context/ProductsContext';
 import { useSettings } from '../../context/SettingsContext';
 import { formatPrice, toFa } from '../../utils/format';
 
-const ADMIN_PIN = '1380';
+const ADMIN_PIN = 'Rozhina8962';
 const GH_STORAGE_KEY = 'rozhina.admin.gh';
 const UNLOCK_KEY = 'rozhina.admin.unlocked';
 
@@ -238,20 +238,16 @@ const PinGate = ({ onSuccess }) => {
   const [pin, setPin] = useState('');
   const [shake, setShake] = useState(false);
 
-  const press = (d) => {
-    if (pin.length >= 4) return;
-    const next = pin + d;
-    setPin(next);
-    if (next.length === 4) {
-      if (next === ADMIN_PIN) {
-        onSuccess();
-      } else {
-        setShake(true);
-        window.setTimeout(() => {
-          setShake(false);
-          setPin('');
-        }, 500);
-      }
+  const submit = () => {
+    if (!pin) return;
+    if (pin === ADMIN_PIN) {
+      onSuccess();
+    } else {
+      setShake(true);
+      window.setTimeout(() => {
+        setShake(false);
+        setPin('');
+      }, 500);
     }
   };
 
@@ -262,43 +258,38 @@ const PinGate = ({ onSuccess }) => {
       </span>
       <div className="text-center">
         <h2 className="text-lg font-extrabold text-pearl">پنل مدیریت روژینا</h2>
-        <p className="mt-1 text-xs text-taupe">برای ادامه، کد ۴ رقمی را وارد کنید</p>
+        <p className="mt-1 text-xs text-taupe">رمز ورود را وارد کنید ({toFa(ADMIN_PIN.length)} کاراکتر)</p>
       </div>
 
       <motion.div
         animate={shake ? { x: [0, -10, 10, -8, 8, 0] } : {}}
         transition={{ duration: 0.45 }}
-        className="flex items-center gap-3"
+        className="w-full max-w-xs"
       >
-        {[0, 1, 2, 3].map((i) => (
-          <span
-            key={i}
-            className={`flex h-14 w-11 items-center justify-center rounded-xl border text-xl font-extrabold transition-all duration-200 ${
-              pin.length > i
-                ? 'border-gold/50 bg-gold/10 text-gold shadow-dot-glow'
-                : 'border-white/10 bg-white/[0.03] text-pearl/20'
-            } ${shake ? 'border-terracotta/60' : ''}`}
-          >
-            {pin.length > i ? '●' : ''}
-          </span>
-        ))}
+        <input
+          type="password"
+          dir="ltr"
+          value={pin}
+          autoFocus
+          onChange={(e) => setPin(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && submit()}
+          placeholder="•••••••••••"
+          className="w-full rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-center text-lg font-bold tracking-[0.5em] text-gold placeholder:text-pearl/20 focus:border-gold/50 focus:outline-none"
+        />
+        <p className="mt-2 text-center text-xs text-taupe">{toFa(pin.length)} / {toFa(ADMIN_PIN.length)}</p>
       </motion.div>
 
-      <div className="grid w-fit grid-cols-3 gap-2.5" dir="ltr">
-        {['1', '2', '3', '4', '5', '6', '7', '8', '9', '', '0', '⌫'].map((k, i) =>
-          k === '' ? (
-            <span key={i} />
-          ) : (
-            <button
-              key={i}
-              type="button"
-              onClick={() => (k === '⌫' ? setPin((p) => p.slice(0, -1)) : press(k))}
-              className="flex h-14 w-16 items-center justify-center rounded-xl border border-white/10 bg-white/[0.03] text-lg font-bold text-pearl transition-all duration-200 hover:border-gold/40 hover:bg-gold/10 active:scale-95"
-            >
-              {k}
-            </button>
-          ),
-        )}
+      <div className="flex items-center gap-3">
+        <button type="button" onClick={submit} className={`${PILL_BTN} btn-gold-modern !px-6 !py-2.5 !text-sm`}>
+          ورود
+        </button>
+        <button
+          type="button"
+          onClick={() => setPin('')}
+          className={`${PILL_BTN} border-white/10 text-pearl/60 hover:border-white/30 hover:text-pearl`}
+        >
+          پاک کردن
+        </button>
       </div>
     </div>
   );
