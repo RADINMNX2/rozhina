@@ -99,9 +99,9 @@ export const serializeProducts = (products) => {
         `    price: ${Number(p.price) || 0},`,
         `    oldPrice: ${p.oldPrice ? Number(p.oldPrice) : 'null'},`,
         `    quantity: ${qty},`,
-        `    badges: ${badges},`,
+        `    ${badges},`,
         `    description: ${q(p.description)},`,
-        `    images: ${images},`,
+        `    ${images},`,
         '  }',
       ].join('\n');
     })
