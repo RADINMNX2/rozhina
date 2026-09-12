@@ -37,9 +37,9 @@ export const PRODUCTS = [
     price: 200,
     oldPrice: 233,
     quantity: 4,
-    badges: badges: ["دست‌دوز"],
+    badges: ["دست‌دوز"],
     description: "1231321",
-    images: images: ["https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQzcugoRJ727QPykGR5_2RHRrfRXoLL3o2WjLlvWfuGOw&s=10"],
+    images: ["https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQzcugoRJ727QPykGR5_2RHRrfRXoLL3o2WjLlvWfuGOw&s=10"],
   }
 ];
 
