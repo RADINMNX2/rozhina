@@ -19,14 +19,17 @@ export const RozhinaProductCard = ({ product }) => {
   };
 
   return (
-    <article className="group relative flex flex-col" data-product-id={product.id}>
-      <div className="relative aspect-[3/4] overflow-hidden bg-espresso/[0.04]">
+    <article
+      data-product-id={product.id}
+      className="card-lux group flex h-full flex-col transition-all duration-500 hover:border-gold/25 hover:shadow-gold-glow"
+    >
+      <div className="relative aspect-[3/4] overflow-hidden rounded-t-2xl bg-white/[0.02] will-change-transform">
         {/* Main / lifestyle shot */}
         <img
           src={product.images[0]}
           alt={product.name}
           loading="lazy"
-          className="absolute inset-0 h-full w-full object-cover transition-all duration-[900ms] ease-out group-hover:scale-[1.045] group-hover:opacity-0"
+          className="absolute inset-0 h-full w-full object-cover transition-all duration-700 ease-out group-hover:scale-[1.03] group-hover:opacity-0"
           onError={withImageFallback}
         />
         {/* Drape / model shot on hover */}
@@ -34,9 +37,12 @@ export const RozhinaProductCard = ({ product }) => {
           src={product.images[1]}
           alt={`استایل ${product.name}`}
           loading="lazy"
-          className="absolute inset-0 h-full w-full scale-[1.03] object-cover opacity-0 transition-all duration-[800ms] ease-out group-hover:scale-100 group-hover:opacity-100"
+          className="absolute inset-0 h-full w-full scale-[1.03] object-cover opacity-0 transition-all duration-700 ease-out group-hover:scale-100 group-hover:opacity-100"
           onError={withImageFallback}
         />
+
+        {/* Soft inner vignette for depth */}
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-obsidian/25 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
 
         {/* Badges */}
         {product.badges.length > 0 && (
@@ -44,7 +50,7 @@ export const RozhinaProductCard = ({ product }) => {
             {product.badges.map((badge) => (
               <span
                 key={badge}
-                className={`px-2.5 py-1 text-[10px] font-bold tracking-wide ${badgeStyle(badge)}`}
+                className={`px-2.5 py-1 text-[10px] font-bold tracking-wide backdrop-blur-sm ${badgeStyle(badge)}`}
               >
                 {badge}
               </span>
@@ -58,26 +64,28 @@ export const RozhinaProductCard = ({ product }) => {
           aria-label={inWishlist ? 'حذف از علاقه‌مندی‌ها' : 'افزودن به علاقه‌مندی‌ها'}
           aria-pressed={inWishlist}
           onClick={() => toggle(product.id)}
-          className="absolute left-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-alabaster/90 shadow-sm backdrop-blur transition-all duration-300 hover:scale-110"
+          className="absolute left-3 top-3 flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-obsidian/70 text-pearl/80 backdrop-blur-md transition-all duration-300 hover:scale-110 active:scale-95"
         >
           <Heart
             size={16}
             strokeWidth={1.8}
             className={`transition-all duration-300 ${
-              inWishlist ? 'fill-terracotta stroke-terracotta' : 'stroke-espresso'
+              inWishlist
+                ? 'fill-gold stroke-gold drop-shadow-[0_0_8px_rgba(226,201,151,0.55)]'
+                : 'text-pearl/80'
             }`}
           />
         </button>
 
-        {/* Quick Add — slides up on hover */}
+        {/* Quick Add — slides up softly on hover */}
         <div className="absolute inset-x-0 bottom-0 translate-y-full opacity-0 transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-y-0 group-hover:opacity-100 max-sm:translate-y-0 max-sm:opacity-100">
           <button
             type="button"
             onClick={handleQuickAdd}
-            className={`flex w-full items-center justify-center gap-2 py-3.5 text-sm font-bold backdrop-blur transition-all duration-300 ${
+            className={`flex w-full items-center justify-center gap-2 rounded-b-2xl py-3.5 text-sm font-bold backdrop-blur-xl transition-all duration-300 active:scale-[0.99] ${
               added
-                ? 'bg-gold text-espresso'
-                : 'bg-espresso/95 text-alabaster hover:bg-gold hover:text-espresso'
+                ? 'bg-gradient-to-b from-gold to-bronze text-obsidian shadow-gold-cta'
+                : 'border-t border-white/10 bg-obsidian/80 text-pearl hover:bg-obsidian/90'
             }`}
           >
             {added ? (
@@ -92,9 +100,9 @@ export const RozhinaProductCard = ({ product }) => {
         </div>
       </div>
 
-      <div className="flex flex-col pt-4">
+      <div className="flex flex-1 flex-col p-5 pt-4">
         <div className="flex items-center justify-between gap-2">
-          <h3 className="text-[15px] font-bold leading-6 text-espresso">{product.name}</h3>
+          <h3 className="text-[15px] font-bold leading-6 text-pearl">{product.name}</h3>
           {product.quantity <= 2 && (
             <span className="whitespace-nowrap text-[10px] font-semibold text-terracotta">
               تنها {toFa(product.quantity)} عدد
@@ -112,14 +120,14 @@ export const RozhinaProductCard = ({ product }) => {
             <span
               key={c.hex}
               title={c.label}
-              className="h-3.5 w-3.5 rounded-full ring-1 ring-inset ring-espresso/15"
+              className="h-3.5 w-3.5 rounded-full ring-1 ring-inset ring-white/15"
               style={{ backgroundColor: c.hex }}
             />
           ))}
         </div>
 
         <div className="mt-3 flex items-baseline gap-2">
-          <span className="text-base font-extrabold tracking-tight text-espresso">
+          <span className="text-base font-extrabold tracking-tight text-pearl">
             {formatPrice(product.price)}
           </span>
           <span className="text-[11px] text-taupe">تومان</span>

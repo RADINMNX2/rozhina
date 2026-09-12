@@ -53,7 +53,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-alabaster">
+    <div className="min-h-screen bg-obsidian">
       <AnnouncementBar />
       <Header onOpenCart={() => setCartOpen(true)} onOpenSearch={() => setSearchOpen(true)} />
 

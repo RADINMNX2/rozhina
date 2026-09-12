@@ -35,15 +35,18 @@ export const SearchOverlay = ({ open, onClose, onSelect }) => {
 
   return (
     <div
-      className={`fixed inset-0 z-[60] bg-alabaster/[0.97] backdrop-blur-lg transition-opacity duration-500 ${
-        open ? 'opacity-100' : 'pointer-events-none opacity-0'
+      className={`fixed inset-0 z-[60] bg-obsidian/[0.97] backdrop-blur-xl transition-opacity duration-500 ${
+        open ? 'animate-fade-in opacity-100' : 'pointer-events-none opacity-0'
       }`}
       role="dialog"
       aria-label="جستجو در کالکشن"
       onClick={onClose}
     >
-      <div className="container-lux mx-auto flex max-h-full flex-col py-16 md:py-24" onClick={(e) => e.stopPropagation()}>
-        <div className="mx-auto flex w-full max-w-2xl items-center gap-4 border-b-2 border-espresso pb-4">
+      <div
+        className="container-lux mx-auto flex max-h-full flex-col py-16 md:py-24"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="mx-auto flex w-full max-w-2xl items-center gap-4 border-b-2 border-white/10 pb-4 transition-colors duration-300 focus-within:border-gold/60">
           <Search size={22} strokeWidth={1.5} className="text-gold" />
           <input
             ref={inputRef}
@@ -51,13 +54,13 @@ export const SearchOverlay = ({ open, onClose, onSelect }) => {
             onChange={(e) => setQuery(e.target.value)}
             type="text"
             placeholder="جستجوی شال، روسری، ابریشم، رنگ…"
-            className="w-full bg-transparent text-lg font-medium outline-none placeholder:text-taupe/60 md:text-xl"
+            className="w-full bg-transparent text-lg font-medium text-pearl outline-none placeholder:text-taupe/60 md:text-xl"
           />
           <button
             type="button"
             aria-label="بستن جستجو"
             onClick={onClose}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-espresso/5"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-pearl/70 transition-colors hover:bg-white/5 hover:text-pearl active:scale-95"
           >
             <X size={20} strokeWidth={1.5} />
           </button>
@@ -73,7 +76,7 @@ export const SearchOverlay = ({ open, onClose, onSelect }) => {
               نتیجه‌ای برای «{query}» یافت نشد.
             </p>
           ) : (
-            <ul className="divide-y divide-espresso/[0.07]">
+            <ul className="divide-y divide-white/[0.06]">
               {results.map((product) => (
                 <li key={product.id}>
                   <button
@@ -82,9 +85,9 @@ export const SearchOverlay = ({ open, onClose, onSelect }) => {
                       onClose();
                       onSelect(product);
                     }}
-                    className="flex w-full items-center gap-4 py-4 text-right transition-colors hover:bg-espresso/[0.03]"
+                    className="flex w-full items-center gap-4 rounded-lg py-4 text-right transition-colors hover:bg-white/[0.03]"
                   >
-                    <span className="relative aspect-[3/4] w-14 shrink-0 overflow-hidden bg-espresso/[0.05]">
+                    <span className="relative aspect-[3/4] w-14 shrink-0 overflow-hidden rounded-md border border-white/5 bg-white/[0.02]">
                       <img
                         src={product.images[0]}
                         alt=""
@@ -94,10 +97,10 @@ export const SearchOverlay = ({ open, onClose, onSelect }) => {
                       />
                     </span>
                     <span className="flex flex-1 flex-col">
-                      <span className="text-sm font-bold text-espresso">{product.name}</span>
+                      <span className="text-sm font-bold text-pearl">{product.name}</span>
                       <span className="mt-1 text-[11px] text-taupe">{product.fabric}</span>
                     </span>
-                    <span className="text-sm font-extrabold tracking-tight text-espresso">
+                    <span className="text-sm font-extrabold tracking-tight text-gold">
                       {formatPrice(product.price)}
                       <span className="mr-1 text-[10px] font-normal text-taupe">تومان</span>
                     </span>

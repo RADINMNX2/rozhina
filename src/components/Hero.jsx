@@ -29,36 +29,46 @@ export const Hero = () => {
           aria-hidden={active !== i}
           loading={i === 0 ? 'eager' : 'lazy'}
           onError={withImageFallback}
-          className={`absolute inset-0 h-full w-full scale-105 object-cover object-top transition-opacity duration-[1200ms] ease-out ${
+          className={`absolute inset-0 h-full w-full scale-105 object-cover object-top brightness-[0.6] saturate-[0.85] transition-opacity duration-[1200ms] ease-out ${
             active === i ? 'animate-zoom-slow opacity-100' : 'opacity-0'
           }`}
         />
       ))}
 
-      <div className="absolute inset-y-0 right-0 w-full bg-gradient-to-l from-alabaster via-alabaster/[0.72] to-transparent sm:w-[72%]" />
-      <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-alabaster/90 to-transparent" />
+      {/* Ambient gold light orbiting the fabric */}
+      <div className="ambient-still animate-ambient pointer-events-none absolute right-[6%] top-1/2 h-[58vmin] w-[58vmin] -translate-y-1/2 rounded-full bg-[radial-gradient(circle_at_center,rgba(226,201,151,0.16),transparent_62%)] blur-2xl" />
+      <div
+        className="ambient-still pointer-events-none absolute bottom-[8%] right-[42%] h-40 w-40 rounded-full bg-[radial-gradient(circle_at_center,rgba(196,164,124,0.12),transparent_65%)] blur-xl"
+        style={{ animationDelay: '-4s' }}
+      />
+
+      <div className="absolute inset-y-0 right-0 w-full bg-gradient-to-l from-obsidian via-obsidian/[0.78] to-transparent sm:w-[74%]" />
+      <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-obsidian via-obsidian/40 to-transparent" />
 
       <div className="container-lux relative flex h-full flex-col justify-center">
         <div className="max-w-2xl">
-          <span className="eyebrow animate-fade-up inline-flex items-center gap-3">
-            <span className="h-px w-8 bg-gold" />
-            کالکشن ۲۰۲۶ — فصل پاییز
+          <span className="animate-fade-up inline-flex items-center gap-3 rounded-full border border-gold/20 bg-gold/[0.07] px-4 py-2 backdrop-blur-md">
+            <span className="h-px w-5 bg-gold shadow-[0_0_8px_rgba(226,201,151,0.6)]" />
+            <span className="font-serif text-[10px] font-semibold uppercase tracking-widest2 text-gold">
+              کالکشن ۲۰۲۶ — فصل پاییز
+            </span>
           </span>
 
           <h1
-            className="animate-fade-up mt-6 text-balance text-4xl font-extrabold leading-[1.2] text-espresso sm:text-5xl md:text-[64px] md:leading-[1.15]"
+            className="animate-fade-up mt-7 text-balance text-4xl font-extrabold leading-[1.25] text-pearl sm:text-5xl md:text-[62px] md:leading-[1.22]"
             style={{ animationDelay: '120ms' }}
           >
-            شکوه و ظرافت در استایل شما
+            شکوهِ تار و پود
             <br />
-            با <span className="text-gold">روژینا</span>
+            در <span className="gold-text font-extrabold">سکوتِ شب</span>
           </h1>
 
           <p
             className="animate-fade-up mt-6 max-w-xl text-base leading-8 text-taupe md:text-lg"
             style={{ animationDelay: '240ms' }}
           >
-            کالکشن منحصربه‌فرد شال و روسری‌های دست‌دوز و پارچه‌های وارداتی
+            درخششِ استایل شما با روژینا — کالکشن منحصربه‌فرد شال و روسری‌های دست‌دوز و پارچه‌های
+            وارداتی.
           </p>
 
           <div
@@ -84,8 +94,10 @@ export const Hero = () => {
               type="button"
               aria-label={`اسلاید ${toFa(i + 1)}`}
               onClick={() => setActive(i)}
-              className={`h-[3px] rounded-full transition-all duration-500 ${
-                active === i ? 'w-9 bg-gold' : 'w-3.5 bg-espresso/25 hover:bg-espresso/45'
+              className={`h-[3px] rounded-full transition-all duration-500 active:scale-95 ${
+                active === i
+                  ? 'w-9 bg-gold shadow-[0_0_12px_rgba(226,201,151,0.7)]'
+                  : 'w-3.5 bg-white/20 hover:bg-white/45'
               }`}
             />
           ))}

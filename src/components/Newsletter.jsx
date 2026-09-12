@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { MailCheck } from 'lucide-react';
+import { Reveal } from './motion/Reveal';
 
 export const Newsletter = () => {
   const [email, setEmail] = useState('');
@@ -11,47 +12,53 @@ export const Newsletter = () => {
   };
 
   return (
-    <section className="border-b border-espresso/10 bg-gold/[0.06] py-20 md:py-24" aria-label="خبرنامه">
-      <div className="container-lux flex flex-col items-center justify-between gap-8 lg:flex-row lg:gap-14">
-        <div className="max-w-xl text-center lg:text-right">
+    <section
+      className="relative overflow-hidden border-b border-white/[0.05] py-20 md:py-24"
+      aria-label="خبرنامه"
+    >
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(226,201,151,0.05),transparent_62%)]" />
+      <div className="container-lux relative flex flex-col items-center justify-between gap-8 lg:flex-row lg:gap-14">
+        <Reveal className="max-w-xl text-center lg:text-right">
           <span className="eyebrow inline-flex items-center gap-3">
-            <span className="h-px w-8 bg-gold" />
+            <span className="h-px w-8 bg-gold shadow-[0_0_8px_rgba(226,201,151,0.5)]" />
             NEWSLETTER
-            <span className="h-px w-8 bg-gold" />
+            <span className="h-px w-8 bg-gold shadow-[0_0_8px_rgba(226,201,151,0.5)]" />
           </span>
-          <h2 className="mt-4 text-2xl font-extrabold leading-snug md:text-4xl">
+          <h2 className="mt-4 text-2xl font-extrabold leading-snug text-pearl md:text-4xl">
             از کالکشن‌های جدید زودتر باخبر شوید
           </h2>
           <p className="mt-3 text-sm leading-8 text-taupe">
             عضو خبرنامه روژینا شوید تا اولین نفر از رونمایی کلکسیون‌های محدود و کدهای تخفیف ویژه باشید.
           </p>
-        </div>
+        </Reveal>
 
-        <form onSubmit={submit} className="w-full max-w-md">
-          {done ? (
-            <div className="flex items-center gap-3 border border-gold/40 bg-alabaster px-5 py-4">
-              <MailCheck size={20} className="shrink-0 text-gold" strokeWidth={1.5} />
-              <p className="text-sm font-medium text-espresso">
-                عضویت شما ثبت شد؛ به‌زودی از کالکشن جدید روژینا مطلع خواهید شد.
-              </p>
-            </div>
-          ) : (
-            <div className="flex flex-col gap-3 sm:flex-row">
-              <input
-                type="email"
-                required
-                dir="ltr"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Email address"
-                className="lux-input flex-1 !text-left"
-              />
-              <button type="submit" className="btn-gold !px-6">
-                عضویت
-              </button>
-            </div>
-          )}
-        </form>
+        <Reveal delay={120} className="w-full max-w-md">
+          <form onSubmit={submit}>
+            {done ? (
+              <div className="flex items-center gap-3 border border-gold/25 bg-gold/[0.06] px-5 py-4 backdrop-blur-xl">
+                <MailCheck size={20} className="shrink-0 text-gold" strokeWidth={1.5} />
+                <p className="text-sm font-medium text-pearl">
+                  عضویت شما ثبت شد؛ به‌زودی از کالکشن جدید روژینا مطلع خواهید شد.
+                </p>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-3 sm:flex-row">
+                <input
+                  type="email"
+                  required
+                  dir="ltr"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Email address"
+                  className="lux-input flex-1 !text-left"
+                />
+                <button type="submit" className="btn-gold btn-shimmer !px-6">
+                  عضویت
+                </button>
+              </div>
+            )}
+          </form>
+        </Reveal>
       </div>
     </section>
   );

@@ -18,7 +18,7 @@ const Badge = ({ count, onClick }) => (
   <span
     key={count}
     onClick={onClick}
-    className="flex h-4 min-w-4 animate-badge-pop items-center justify-center rounded-full bg-gold px-1 text-[10px] font-bold leading-none text-espresso"
+    className="flex h-4 min-w-4 animate-badge-pop items-center justify-center rounded-full bg-gradient-to-b from-gold to-bronze px-1 text-[10px] font-bold leading-none text-obsidian shadow-dot-glow"
   >
     {toFa(count)}
   </span>
@@ -29,7 +29,7 @@ const IconButton = ({ label, onClick, children }) => (
     type="button"
     aria-label={label}
     onClick={onClick}
-    className="relative flex h-10 w-10 items-center justify-center rounded-full text-espresso transition-all duration-300 hover:bg-espresso/[0.06] hover:text-espresso"
+    className="relative flex h-10 w-10 items-center justify-center rounded-full text-pearl/75 transition-all duration-300 hover:bg-white/[0.06] hover:text-gold active:scale-[0.94]"
   >
     {children}
   </button>
@@ -58,10 +58,10 @@ export const Header = ({ onOpenCart, onOpenSearch }) => {
   return (
     <>
       <header
-        className={`sticky top-0 z-40 border-b transition-all duration-500 ${
+        className={`sticky top-0 z-40 border-b backdrop-blur-lg transition-all duration-500 ${
           scrolled
-            ? 'border-espresso/10 bg-alabaster/[0.92] shadow-[0_10px_40px_-16px_rgba(28,25,23,0.14)] backdrop-blur-md'
-            : 'border-transparent bg-alabaster'
+            ? 'border-white/[0.06] bg-obsidian/85 shadow-nav-float'
+            : 'border-white/[0.04] bg-obsidian/55'
         }`}
       >
         <div className="container-lux">
@@ -93,8 +93,10 @@ export const Header = ({ onOpenCart, onOpenSearch }) => {
                 <Heart
                   size={20}
                   strokeWidth={1.5}
-                  className={`transition-colors duration-300 ${
-                    wishlistCount > 0 ? 'fill-terracotta stroke-terracotta' : 'text-espresso'
+                  className={`transition-all duration-300 ${
+                    wishlistCount > 0
+                      ? 'fill-gold stroke-gold drop-shadow-[0_0_8px_rgba(226,201,151,0.5)]'
+                      : 'text-pearl/75'
                   }`}
                 />
                 {wishlistCount > 0 && (
@@ -124,23 +126,23 @@ export const Header = ({ onOpenCart, onOpenSearch }) => {
         aria-hidden={!mobileOpen}
       >
         <div
-          className={`absolute inset-0 bg-espresso/40 backdrop-blur-sm transition-opacity duration-500 ${
+          className={`absolute inset-0 bg-obsidian/70 backdrop-blur-md transition-opacity duration-500 ${
             mobileOpen ? 'opacity-100' : 'opacity-0'
           }`}
           onClick={() => setMobileOpen(false)}
         />
         <aside
-          className={`absolute right-0 top-0 flex h-full w-[86%] max-w-sm flex-col bg-alabaster shadow-2xl transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+          className={`absolute right-0 top-0 flex h-full w-[86%] max-w-sm flex-col border-l border-white/[0.06] bg-[#0F0E0D]/95 backdrop-blur-xl shadow-nav-float transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
             mobileOpen ? 'translate-x-0' : 'translate-x-full'
           }`}
         >
-          <div className="flex items-center justify-between border-b border-espresso/10 px-6 py-5">
+          <div className="flex items-center justify-between border-b border-white/[0.06] px-6 py-5">
             <Logo compact />
             <button
               type="button"
               aria-label="بستن منو"
               onClick={() => setMobileOpen(false)}
-              className="flex h-10 w-10 items-center justify-center rounded-full transition-colors hover:bg-espresso/5"
+              className="flex h-10 w-10 items-center justify-center rounded-full text-pearl/70 transition-colors hover:bg-white/5 hover:text-pearl"
             >
               <X size={20} strokeWidth={1.5} />
             </button>
@@ -152,7 +154,7 @@ export const Header = ({ onOpenCart, onOpenSearch }) => {
                 key={link.label}
                 href={link.href}
                 onClick={() => setMobileOpen(false)}
-                className="animate-fade-up border-b border-espresso/[0.07] px-3 py-4 text-[15px] font-medium text-espresso/85 transition-colors hover:text-gold"
+                className="animate-fade-up border-b border-white/[0.06] px-3 py-4 text-[15px] font-medium text-pearl/85 transition-colors hover:text-gold"
                 style={{ animationDelay: `${i * 60}ms` }}
               >
                 {link.label}
@@ -160,17 +162,17 @@ export const Header = ({ onOpenCart, onOpenSearch }) => {
             ))}
           </nav>
 
-          <div className="mt-auto border-t border-espresso/10 px-6 py-6">
+          <div className="mt-auto border-t border-white/[0.06] px-6 py-6">
             <a
               href={INSTAGRAM_URL}
               target="_blank"
               rel="noreferrer"
-              className="flex items-center gap-3 text-sm text-espresso/70 transition-colors hover:text-gold"
+              className="flex items-center gap-3 text-sm text-pearl/75 transition-colors hover:text-gold"
             >
-              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-espresso text-gold">
+              <span className="flex h-10 w-10 items-center justify-center rounded-full border border-gold/20 bg-gold/[0.08] text-gold">
                 <Instagram size={18} strokeWidth={1.5} />
               </span>
-            {INSTAGRAM_HANDLE}
+              {INSTAGRAM_HANDLE}
             </a>
             <p className="mt-3 text-xs leading-6 text-taupe">
               ارسال رایگان به سراسر کشور برای خریدهای بالای ۱ میلیون تومان

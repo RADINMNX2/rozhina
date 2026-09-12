@@ -5,20 +5,40 @@
 @layer base {
   html {
     scroll-behavior: smooth;
+    color-scheme: dark;
   }
 
   body {
-    @apply bg-alabaster font-sans text-espresso antialiased;
+    @apply bg-obsidian font-sans text-pearl antialiased;
+    color-scheme: dark;
     text-rendering: optimizeLegibility;
     font-feature-settings: 'ss01';
   }
 
   ::selection {
-    @apply bg-gold/40 text-espresso;
+    @apply bg-gold/30 text-pearl;
   }
 
   button {
     cursor: pointer;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #0c0b0a;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgba(226, 201, 151, 0.16);
+    border-radius: 999px;
+    border: 2px solid #0c0b0a;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(226, 201, 151, 0.3);
   }
 }
 
@@ -27,12 +47,20 @@
     @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-10;
   }
 
+  .glass {
+    @apply border border-white/5 bg-glass backdrop-blur-xl;
+  }
+
+  .card-lux {
+    @apply relative overflow-hidden rounded-2xl border border-white/5 bg-white/[0.03] backdrop-blur-xl;
+  }
+
   .eyebrow {
     @apply font-serif text-[10px] font-semibold uppercase tracking-widest2 text-gold;
   }
 
   .lux-link {
-    @apply relative text-sm font-medium text-espresso/75 transition-colors duration-300 hover:text-espresso;
+    @apply relative text-sm font-medium text-pearl/65 transition-colors duration-300 hover:text-pearl;
   }
 
   .lux-link::after {
@@ -45,11 +73,28 @@
   }
 
   .btn-gold {
-    @apply inline-flex items-center justify-center gap-2 bg-gold px-8 py-4 text-sm font-bold tracking-wide text-espresso transition-all duration-500 hover:-translate-y-0.5 hover:bg-espresso hover:text-gold hover:shadow-[0_18px_40px_-12px_rgba(28,25,23,0.5)];
+    @apply inline-flex items-center justify-center gap-2 bg-gradient-to-b from-gold to-bronze px-8 py-4 text-sm font-bold tracking-wide text-obsidian shadow-gold-cta transition-all duration-500 hover:-translate-y-0.5 hover:shadow-gold-glow active:scale-[0.98];
   }
 
   .btn-outline {
-    @apply inline-flex items-center justify-center gap-2 border border-espresso/25 px-8 py-4 text-sm font-semibold text-espresso transition-all duration-500 hover:border-espresso hover:bg-espresso hover:text-alabaster;
+    @apply inline-flex items-center justify-center gap-2 border border-white/15 px-8 py-4 text-sm font-semibold text-pearl transition-all duration-500 hover:border-gold/50 hover:bg-gold/5 hover:text-gold active:scale-[0.98];
+  }
+
+  .btn-shimmer {
+    @apply relative overflow-hidden;
+  }
+
+  .btn-shimmer::after {
+    content: '';
+    @apply absolute inset-y-0 w-1/2 -translate-x-[220%] skew-x-[-20deg] bg-gradient-to-r from-transparent via-white/30 to-transparent transition-transform duration-1000 ease-out;
+  }
+
+  .btn-shimmer:hover::after {
+    @apply translate-x-[320%];
+  }
+
+  .lux-input {
+    @apply w-full border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-pearl outline-none backdrop-blur-xl transition-colors duration-300 placeholder:text-taupe/70 focus:border-gold/60;
   }
 
   .no-scrollbar::-webkit-scrollbar {
@@ -60,14 +105,32 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
-
-  .lux-input {
-    @apply w-full border border-espresso/15 bg-alabaster px-4 py-3 text-sm text-espresso outline-none transition-colors duration-300 placeholder:text-taupe/70 focus:border-gold;
-  }
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+
+  .gold-text {
+    background: linear-gradient(
+      120deg,
+      #e2c997 0%,
+      #f3f0ea 45%,
+      #c4a47c 75%,
+      #e2c997 100%
+    );
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .hairline-glow {
+    @apply shadow-[0_0_10px_rgba(226,201,151,0.35)];
+  }
+
+  .ambient-still {
+    will-change: opacity, transform;
   }
 }
