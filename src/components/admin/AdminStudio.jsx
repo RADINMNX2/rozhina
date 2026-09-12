@@ -24,6 +24,7 @@ import { formatPrice, toFa } from '../../utils/format';
 const ADMIN_PIN = 'Rozhina8962';
 const GH_STORAGE_KEY = 'rozhina.admin.gh';
 const UNLOCK_KEY = 'rozhina.admin.unlocked';
+const LAST_SYNC_KEY = 'rozhina.admin.lastSync';
 
 const GH_API = 'https://api.github.com';
 const GH_HEADERS = { Accept: 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28' };
@@ -179,6 +180,21 @@ async function ghPutFile(pat, owner, repo, path, content, message, branch) {
   return res.json();
 }
 
+async function ghFetchFile(pat, owner, repo, path, branch) {
+  const url = `${GH_API}/repos/${owner}/${repo}/contents/${path}?ref=${branch}`;
+  const res = await fetch(url, { headers: { ...GH_HEADERS, Authorization: `Bearer ${pat}` } });
+  if (!res.ok) {
+    if (res.status === 404) return null;
+    throw new Error(`خطای ${res.status} در دریافت فایل ${path}`);
+  }
+  const json = await res.json();
+  if (!json.content) return null;
+  const bin = atob(json.content.replace(/\s/g, ''));
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i += 1) bytes[i] = bin.charCodeAt(i);
+  return new TextDecoder().decode(bytes);
+}
+
 /* ---------------- tiny primitives ---------------- */
 const Field = ({ label, hint, children }) => (
   <label className="flex flex-col gap-1.5">
@@ -314,10 +330,40 @@ const EMPTY_DRAFT = {
 /* ---------------- image upload ---------------- */
 const readFileAsDataURL = (file) =>
   new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = () => reject(new Error('read failed'));
-    reader.readAsDataURL(file);
+    const readRaw = () =>
+      new Promise((res, rej) => {
+        const reader = new FileReader();
+        reader.onload = () => res(reader.result);
+        reader.onerror = () => rej(new Error('read failed'));
+        reader.readAsDataURL(file);
+      });
+    const objectUrl = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = async () => {
+      try {
+        const MAX = 1000;
+        const scale = Math.min(1, MAX / Math.max(img.width, img.height));
+        if (scale >= 1) {
+          URL.revokeObjectURL(objectUrl);
+          resolve(await readRaw());
+          return;
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.round(img.width * scale);
+        canvas.height = Math.round(img.height * scale);
+        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+        URL.revokeObjectURL(objectUrl);
+        resolve(canvas.toDataURL('image/jpeg', 0.85));
+      } catch {
+        URL.revokeObjectURL(objectUrl);
+        resolve(await readRaw());
+      }
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(objectUrl);
+      readRaw().then(resolve).catch(reject);
+    };
+    img.src = objectUrl;
   });
 
 const ProductEditor = ({ product, onClose, onSave }) => {
@@ -1107,6 +1153,7 @@ const GithubTab = ({ pushRef }) => {
       );
       setStatus('ok');
       setStatusMsg('منتشر شد! دیپلوی خودکار در حال اجراست…');
+      localStorage.setItem(LAST_SYNC_KEY, `${serializeProducts(products)}\n___\n${serializeConstants(settings)}`);
       pushRef?.current?.('success', 'تغییرات در GitHub منتشر شد — سایت به‌زودی بروزرسانی می‌شود');
     } catch (err) {
       setStatus('error');
@@ -1174,8 +1221,9 @@ const GithubTab = ({ pushRef }) => {
     <div className="space-y-4">
       <Panel title="انتشار روی گیت‌هاب (دیپلوی خودکار)" icon={Github}>
         <p className="mb-4 rounded-xl border border-white/[0.06] bg-white/[0.02] px-4 py-3 text-[11px] leading-6 text-taupe">
-          با یک کلیک، فایل‌های <span dir="ltr">productsData.js</span> و <span dir="ltr">constants.js</span> مستقیماً
-          در مخزن به‌روزرسانی و کامیت می‌شوند و GitHub Actions به‌صورت خودکار سایت را دیپلوی می‌کند.
+          هر تغییری که در پنل ایجاد کنید (محصولات یا تنظیمات)، به‌صورت خودکار و پس از چند ثانیه به‌شکل
+          کامیت روی فایل‌های <span dir="ltr">productsData.js</span> و <span dir="ltr">constants.js</span> منتشر می‌شود
+          و GitHub Actions سایت را بروزرسانی می‌کند. دکمهٔ زیر برای انتشار فوری و همزمان هر دو فایل است.
           توکن فقط در مرورگر خودتان (localStorage) ذخیره می‌شود.
         </p>
 
@@ -1268,6 +1316,99 @@ const GithubTab = ({ pushRef }) => {
   );
 };
 
+/* ---------------- auto publisher ---------------- */
+const AutoPublisher = ({ pushRef }) => {
+  const { products } = useProducts();
+  const { settings } = useSettings();
+  const timer = useRef(null);
+  const inflight = useRef(false);
+  const sizeBlocked = useRef('');
+
+  const currentPayload = useCallback(
+    () => `${serializeProducts(products)}\n___\n${serializeConstants(settings)}`,
+    [products, settings],
+  );
+
+  const publish = useCallback(async () => {
+    const meta = readGhMeta();
+    if (!meta.pat.trim() || !meta.owner.trim() || !meta.repo.trim()) return;
+    if (inflight.current) return;
+    inflight.current = true;
+    try {
+      const payload = currentPayload();
+      if (payload.length > 900 * 1024) {
+        sizeBlocked.current = payload;
+        pushRef?.current?.('error', 'حجم داده‌ها زیاد است؛ از لینک تصویر به‌جای آپلود استفاده کنید.');
+        return;
+      }
+      sizeBlocked.current = '';
+      await ghPutFile(
+        meta.pat, meta.owner, meta.repo, 'src/data/productsData.js',
+        serializeProducts(products),
+        'chore(content): auto-sync products from Rozhina Admin Studio', meta.branch,
+      );
+      await ghPutFile(
+        meta.pat, meta.owner, meta.repo, 'src/data/constants.js',
+        serializeConstants(settings),
+        'chore(content): auto-sync settings from Rozhina Admin Studio', meta.branch,
+      );
+      localStorage.setItem(LAST_SYNC_KEY, payload);
+      pushRef?.current?.('success', 'تغییرات خودکار روی سرور منتشر شد — سایت در حال بروزرسانی است');
+    } catch (err) {
+      pushRef?.current?.('error', `انتشار خودکار ناموفق: ${String(err?.message || err).slice(0, 60)}`);
+    } finally {
+      inflight.current = false;
+    }
+    const pending = currentPayload();
+    if (
+      pending !== localStorage.getItem(LAST_SYNC_KEY) &&
+      pending !== sizeBlocked.current &&
+      readGhMeta().pat.trim()
+    ) {
+      timer.current = window.setTimeout(publish, 1500);
+    }
+  }, [currentPayload, products, settings, pushRef]);
+
+  useEffect(() => {
+    const meta = readGhMeta();
+    if (!meta.pat.trim() || !meta.owner.trim() || !meta.repo.trim()) return;
+    let cancelled = false;
+
+    const seedOrCheck = async () => {
+      if (cancelled || localStorage.getItem(LAST_SYNC_KEY)) return;
+      try {
+        const [serverProducts, serverConstants] = await Promise.all([
+          ghFetchFile(meta.pat, meta.owner, meta.repo, 'src/data/productsData.js', meta.branch),
+          ghFetchFile(meta.pat, meta.owner, meta.repo, 'src/data/constants.js', meta.branch),
+        ]);
+        if (cancelled) return;
+        const drifted =
+          (serverProducts !== null && serverProducts !== serializeProducts(products)) ||
+          (serverConstants !== null && serverConstants !== serializeConstants(settings));
+        if (drifted) {
+          publish();
+          return;
+        }
+      } catch {
+        /* بدون توکن معتبر، فقط baseline محلی ذخیره می‌شود */
+      }
+      localStorage.setItem(LAST_SYNC_KEY, currentPayload());
+    };
+    seedOrCheck();
+
+    timer.current = window.setTimeout(() => {
+      const last = localStorage.getItem(LAST_SYNC_KEY);
+      if (last && currentPayload() !== last) publish();
+    }, 3000);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer.current);
+    };
+  }, [products, settings, currentPayload, publish]);
+
+  return null;
+};
+
 /* ---------------- shell ---------------- */
 const TABS = [
   { key: 'products', label: 'محصولات', icon: Package },
@@ -1344,6 +1485,7 @@ export const AdminStudio = () => {
   return (
     <>
       <ToastHost toasts={toasts} />
+      <AutoPublisher pushRef={pushRef} />
       <AnimatePresence>
         {open && (
           <motion.div
