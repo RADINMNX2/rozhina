@@ -173,20 +173,27 @@ async function ghGetFile(pat, owner, repo, path, branch) {
 }
 
 async function ghPutFile(pat, owner, repo, path, content, message, branch) {
-  const sha = await ghGetFile(pat, owner, repo, path, branch);
-  const url = `${GH_API}/repos/${owner}/${repo}/contents/${path}`;
-  const body = { message, content: encodeB64(content), branch };
-  if (sha) body.sha = sha;
-  const res = await fetch(url, {
-    method: 'PUT',
-    headers: { ...GH_HEADERS, Authorization: `Bearer ${pat}` },
-    body: JSON.stringify(body),
-  });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err.message || `خطای ${res.status} در انتشار فایل ${path}`);
+  for (let attempt = 0; attempt < 5; attempt += 1) {
+    if (attempt > 0) await new Promise((r) => window.setTimeout(r, 600 * attempt));
+    const sha = await ghGetFile(pat, owner, repo, path, branch);
+    const url = `${GH_API}/repos/${owner}/${repo}/contents/${path}`;
+    const body = { message, content: encodeB64(content), branch };
+    if (sha) body.sha = sha;
+    const res = await fetch(url, {
+      method: 'PUT',
+      headers: { ...GH_HEADERS, Authorization: `Bearer ${pat}` },
+      body: JSON.stringify(body),
+    });
+    if (res.status === 409 || res.status === 422) {
+      continue; // هم‌زمان با انتشار دیگری برخورد کرد؛ عکس تازه بگیر و دوباره تلاش کن
+    }
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.message || `خطای ${res.status} در انتشار فایل ${path}`);
+    }
+    return res.json();
   }
-  return res.json();
+  throw new Error(`هم‌زمانی انتشار ${path}; لحظاتی بعد دوباره تلاش می‌شود`);
 }
 
 async function ghFetchFile(pat, owner, repo, path, branch) {
