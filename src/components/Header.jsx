@@ -3,16 +3,9 @@ import { Heart, Instagram, Menu, Search, ShoppingBag, X } from 'lucide-react';
 import { Logo } from './Logo';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
+import { useSettings } from '../context/SettingsContext';
+import { useContent } from '../context/ContentContext';
 import { toFa } from '../utils/format';
-import { INSTAGRAM_HANDLE, INSTAGRAM_URL } from '../data/constants';
-
-const NAV_LINKS = [
-  { label: 'کالکشن جدید', href: '#collection' },
-  { label: 'شال ابریشم', href: '#collection' },
-  { label: 'روسی مینی اسکارف', href: '#collection' },
-  { label: 'شال پاییزه', href: '#collection' },
-  { label: 'لوک‌بوک', href: '#lookbook' },
-];
 
 const Badge = ({ count, onClick }) => (
   <span
@@ -38,6 +31,9 @@ const IconButton = ({ label, onClick, children }) => (
 export const Header = ({ onOpenCart, onOpenSearch }) => {
   const { totalItems } = useCart();
   const { count: wishlistCount } = useWishlist();
+  const { settings } = useSettings();
+  const { content } = useContent();
+  const navLinks = content.nav ?? [];
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -67,7 +63,7 @@ export const Header = ({ onOpenCart, onOpenSearch }) => {
         <div className="container-lux">
           <div className="relative flex h-16 items-center justify-between gap-2 md:h-[76px]">
             <nav className="hidden items-center gap-7 xl:flex" aria-label="ناوبری اصلی">
-              {NAV_LINKS.map((link) => (
+              {navLinks.map((link) => (
                 <a key={link.label} href={link.href} className="lux-link">
                   {link.label}
                 </a>
@@ -149,7 +145,7 @@ export const Header = ({ onOpenCart, onOpenSearch }) => {
           </div>
 
           <nav className="flex flex-col gap-1 px-4 pt-4" aria-label="منوی موبایل">
-            {NAV_LINKS.map((link, i) => (
+            {navLinks.map((link, i) => (
               <a
                 key={link.label}
                 href={link.href}
@@ -164,7 +160,7 @@ export const Header = ({ onOpenCart, onOpenSearch }) => {
 
           <div className="mt-auto border-t border-white/[0.06] px-6 py-6">
             <a
-              href={INSTAGRAM_URL}
+              href={settings.instagramUrl}
               target="_blank"
               rel="noreferrer"
               className="flex items-center gap-3 text-sm text-pearl/75 transition-colors hover:text-gold"
@@ -172,10 +168,10 @@ export const Header = ({ onOpenCart, onOpenSearch }) => {
               <span className="flex h-10 w-10 items-center justify-center rounded-full border border-gold/20 bg-gold/[0.08] text-gold">
                 <Instagram size={18} strokeWidth={1.5} />
               </span>
-              {INSTAGRAM_HANDLE}
+              {settings.instagramHandle}
             </a>
             <p className="mt-3 text-xs leading-6 text-taupe">
-              ارسال رایگان به سراسر کشور برای خریدهای بالای ۱ میلیون تومان
+              {content.menu.shippingNote}
             </p>
           </div>
         </aside>

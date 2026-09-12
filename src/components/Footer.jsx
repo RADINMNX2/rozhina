@@ -1,29 +1,21 @@
 import { Instagram, Lock, MapPin, Phone } from 'lucide-react';
 import { Logo } from './Logo';
 import { useSettings } from '../context/SettingsContext';
-
-const QUICK_LINKS = [
-  { label: 'کالکشن جدید', href: '#collection' },
-  { label: 'شال ابریشم', href: '#collection' },
-  { label: 'روسی مینی اسکارف', href: '#collection' },
-  { label: 'شال پاییزه', href: '#collection' },
-  { label: 'لوک‌بوک', href: '#lookbook' },
-];
-
-const HELP_LINKS = ['راهنمای انتخاب سایز', 'روش‌های ارسال', 'سیاست بازگشت کالا', 'همکاری با ما'];
+import { useContent } from '../context/ContentContext';
 
 const openAdmin = () => window.dispatchEvent(new Event('rozhina:open-admin'));
 
 export const Footer = () => {
   const { settings } = useSettings();
+  const { content } = useContent();
+  const c = content.footer ?? {};
   return (
   <footer className="border-t border-white/[0.05] bg-[#0A0909] text-pearl">
     <div className="container-lux grid gap-12 py-16 md:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1.2fr]">
       <div>
         <Logo />
         <p className="mt-5 max-w-sm text-sm leading-8 text-pearl/55">
-          گالری شال و روسری روژینا؛ خانه‌ی شال‌ و روسری‌های دست‌دوز از الیاف طبیعی و پارچه‌های
-          وارداتی. ظرافت را به استایل خود بیاورید.
+          {c.description}
         </p>
         <a
           href={settings.instagramUrl}
@@ -36,12 +28,12 @@ export const Footer = () => {
         </a>
       </div>
 
-      <nav aria-label="دسترسی سریع">
+      <nav aria-label={c.headingQuick}>
         <h3 className="font-serif text-[10px] font-semibold uppercase tracking-widest2 text-gold">
-          دسترسی سریع
+          {c.headingQuick}
         </h3>
         <ul className="mt-5 space-y-3">
-          {QUICK_LINKS.map((l) => (
+          {(c.quickLinks ?? []).map((l) => (
             <li key={l.label}>
               <a
                 href={l.href}
@@ -56,16 +48,16 @@ export const Footer = () => {
 
       <div>
         <h3 className="font-serif text-[10px] font-semibold uppercase tracking-widest2 text-gold">
-          راهنمای خرید
+          {c.headingHelp}
         </h3>
         <ul className="mt-5 space-y-3">
-          {HELP_LINKS.map((label) => (
-            <li key={label}>
+          {(c.helpLinks ?? []).map((l) => (
+            <li key={l.label}>
               <a
-                href="#collection"
+                href={l.href ?? '#collection'}
                 className="text-sm text-pearl/60 transition-colors duration-300 hover:text-gold"
               >
-                {label}
+                {l.label}
               </a>
             </li>
           ))}
@@ -74,7 +66,7 @@ export const Footer = () => {
 
       <div>
         <h3 className="font-serif text-[10px] font-semibold uppercase tracking-widest2 text-gold">
-          تماس با گالری
+          {c.headingContact}
         </h3>
         <ul className="mt-5 space-y-4 text-sm text-pearl/60">
           <li className="flex items-center gap-3">
@@ -93,13 +85,13 @@ export const Footer = () => {
             <span className="flex h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-white/[0.03]">
               <Lock size={13} strokeWidth={1.6} className="text-gold" />
             </span>
-            <span>پشتیبانی: {settings.supportId}</span>
+            <span>{c.supportLabel} {settings.supportId}</span>
           </li>
           <li className="flex items-center gap-3">
             <span className="flex h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-white/[0.03]">
               <MapPin size={13} strokeWidth={1.6} className="text-gold" />
             </span>
-            <span>تهران، خیابان ولیعصر، گالری روژینا</span>
+            <span>{c.address}</span>
           </li>
         </ul>
       </div>
@@ -107,11 +99,11 @@ export const Footer = () => {
 
     <div className="border-t border-white/[0.06]">
       <div className="container-lux flex flex-col items-center justify-between gap-3 py-6 text-center text-xs text-pearl/40 md:flex-row">
-        <p>© ۱۴۰۵ گالری شال و روسری روژینا — تمامی حقوق محفوظ است.</p>
+        <p>{c.copyright}</p>
         <div className="flex items-center gap-4">
           <p className="flex items-center gap-2">
             <span className="h-1 w-1 rounded-full bg-gold shadow-[0_0_6px_rgba(226,201,151,0.7)]" />
-            طراحی با ظرافت برای عاشقان استایل
+            {c.tagline}
             <span className="h-1 w-1 rounded-full bg-gold shadow-[0_0_6px_rgba(226,201,151,0.7)]" />
           </p>
           <button

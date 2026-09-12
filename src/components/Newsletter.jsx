@@ -1,10 +1,13 @@
 import { useState } from 'react';
 import { MailCheck } from 'lucide-react';
 import { Reveal } from './motion/Reveal';
+import { useContent } from '../context/ContentContext';
 
 export const Newsletter = () => {
   const [email, setEmail] = useState('');
   const [done, setDone] = useState(false);
+  const { content } = useContent();
+  const c = content.newsletter ?? {};
 
   const submit = (e) => {
     e.preventDefault();
@@ -25,10 +28,10 @@ export const Newsletter = () => {
             <span className="h-px w-8 bg-gold shadow-[0_0_8px_rgba(226,201,151,0.5)]" />
           </span>
           <h2 className="mt-4 text-2xl font-extrabold leading-snug text-pearl md:text-4xl">
-            از کالکشن‌های جدید زودتر باخبر شوید
+            {c.title}
           </h2>
           <p className="mt-3 text-sm leading-8 text-taupe">
-            عضو خبرنامه روژینا شوید تا اولین نفر از رونمایی کلکسیون‌های محدود و کدهای تخفیف ویژه باشید.
+            {c.subtitle}
           </p>
         </Reveal>
 
@@ -38,7 +41,7 @@ export const Newsletter = () => {
               <div className="flex items-center gap-3 border border-gold/25 bg-gold/[0.06] px-5 py-4 backdrop-blur-xl">
                 <MailCheck size={20} className="shrink-0 text-gold" strokeWidth={1.5} />
                 <p className="text-sm font-medium text-pearl">
-                  عضویت شما ثبت شد؛ به‌زودی از کالکشن جدید روژینا مطلع خواهید شد.
+                  {c.success}
                 </p>
               </div>
             ) : (
@@ -53,7 +56,7 @@ export const Newsletter = () => {
                   className="lux-input flex-1 !text-left"
                 />
                 <button type="submit" className="btn-gold btn-shimmer !px-6">
-                  عضویت
+                  {c.button}
                 </button>
               </div>
             )}

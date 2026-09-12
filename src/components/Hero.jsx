@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { ArrowDown } from 'lucide-react';
 import { toFa } from '../utils/format';
 import { withImageFallback } from '../utils/imageFallback';
+import { useContent } from '../context/ContentContext';
 
 const photo = (id) => `https://images.unsplash.com/${id}?auto=format&fit=crop&w=1800&q=80`;
 
@@ -12,6 +13,7 @@ const SLIDES = [
 ];
 
 export const Hero = () => {
+  const { content } = useContent();
   const [active, setActive] = useState(0);
 
   useEffect(() => {
@@ -50,7 +52,7 @@ export const Hero = () => {
           <span className="animate-fade-up inline-flex items-center gap-3 rounded-full border border-gold/20 bg-gold/[0.07] px-4 py-2 backdrop-blur-md">
             <span className="h-px w-5 bg-gold shadow-[0_0_8px_rgba(226,201,151,0.6)]" />
             <span className="font-serif text-[10px] font-semibold uppercase tracking-widest2 text-gold">
-              کالکشن ۲۰۲۶ — فصل پاییز
+              {content.hero.eyebrow}
             </span>
           </span>
 
@@ -58,17 +60,16 @@ export const Hero = () => {
             className="animate-fade-up mt-7 text-balance text-4xl font-extrabold leading-[1.25] text-pearl sm:text-5xl md:text-[62px] md:leading-[1.22]"
             style={{ animationDelay: '120ms' }}
           >
-            شکوهِ تار و پود
+            {content.hero.title1}
             <br />
-            در <span className="gold-text font-extrabold">سکوتِ شب</span>
+            <span className="gold-text font-extrabold">{content.hero.title2}</span>
           </h1>
 
           <p
             className="animate-fade-up mt-6 max-w-xl text-base leading-8 text-taupe md:text-lg"
             style={{ animationDelay: '240ms' }}
           >
-            درخششِ استایل شما با روژینا — کالکشن منحصربه‌فرد شال و روسری‌های دست‌دوز و پارچه‌های
-            وارداتی.
+            {content.hero.subtitle}
           </p>
 
           <div
@@ -76,11 +77,11 @@ export const Hero = () => {
             style={{ animationDelay: '360ms' }}
           >
             <a href="#collection" className="btn-gold animate-float">
-              کشف کالکشن جدید
+              {content.hero.ctaPrimary}
               <ArrowDown size={17} strokeWidth={2} aria-hidden />
             </a>
             <a href="#lookbook" className="btn-outline">
-              مشاهده لوک‌بوک
+              {content.hero.ctaSecondary}
             </a>
           </div>
         </div>

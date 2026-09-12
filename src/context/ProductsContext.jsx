@@ -33,6 +33,7 @@ export const normalizeProduct = (data, id) => {
     id: Number(id),
     name,
     enName: String(data?.enName ?? '').trim(),
+    code: String(data?.code ?? '').trim(),
     fabric: String(data?.fabric ?? '').trim() || 'ابریشم',
     dimensions: String(data?.dimensions ?? '').trim(),
     colors:

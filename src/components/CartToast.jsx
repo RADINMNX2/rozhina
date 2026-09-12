@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { Check, ShoppingBag } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useProducts } from '../context/ProductsContext';
+import { useContent } from '../context/ContentContext';
 import { formatPrice } from '../utils/format';
 
 const AUTO_DISMISS_MS = 3500;
@@ -10,6 +11,7 @@ const AUTO_DISMISS_MS = 3500;
 export const CartToast = ({ threshold = 480 }) => {
   const { lastAdded } = useCart();
   const { getProduct } = useProducts();
+  const { content } = useContent();
   const [visible, setVisible] = useState(false);
   const [productId, setProductId] = useState(null);
 
@@ -59,7 +61,7 @@ export const CartToast = ({ threshold = 480 }) => {
               </span>
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-xs font-bold text-pearl">به سبد خرید اضافه شد</p>
+              <p className="text-xs font-bold text-pearl">{content.cartToast.title}</p>
               <p className="mt-0.5 truncate text-[11px] text-taupe">{product.name}</p>
             </div>
             <div className="text-left">

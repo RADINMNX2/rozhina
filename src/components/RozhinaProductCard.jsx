@@ -6,11 +6,14 @@ import { formatPrice, toFa } from '../utils/format';
 import { withImageFallback } from '../utils/imageFallback';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
+import { useContent } from '../context/ContentContext';
+import { t } from '../utils/text';
 import { SpotlightCard } from './SpotlightCard';
 
 export const RozhinaProductCard = ({ product, onQuickView }) => {
   const { addItem } = useCart();
   const { toggle, isInWishlist } = useWishlist();
+  const { content } = useContent();
   const [added, setAdded] = useState(false);
   const inWishlist = isInWishlist(product.id);
 
@@ -117,7 +120,7 @@ export const RozhinaProductCard = ({ product, onQuickView }) => {
                     className="flex items-center justify-center gap-2"
                   >
                     <Check size={15} strokeWidth={3} />
-                    به سبد اضافه شد
+                    {t(content.card.addedToCart)}
                   </motion.span>
                 ) : (
                   <motion.span
@@ -129,7 +132,7 @@ export const RozhinaProductCard = ({ product, onQuickView }) => {
                     className="flex items-center justify-center gap-2"
                   >
                     <ShoppingBag size={15} strokeWidth={2.2} />
-                    افزودن به سبد
+                    {t(content.card.addToCart)}
                     <span className="whitespace-nowrap rounded-full bg-obsidian/25 px-2 py-0.5 text-[10px] font-bold tracking-wide">
                       {formatPrice(product.price)}
                     </span>
@@ -145,17 +148,24 @@ export const RozhinaProductCard = ({ product, onQuickView }) => {
             <h3 className="text-[15px] font-bold leading-6 text-pearl">{product.name}</h3>
             {product.quantity <= 2 && (
               <span className="whitespace-nowrap text-[10px] font-semibold text-terracotta">
-                تنها {toFa(product.quantity)} عدد
+                {t(content.card.lowStock, { n: toFa(product.quantity) })}
               </span>
             )}
           </div>
 
-          <p className="mt-0.5 text-[11px] font-serif tracking-wide text-taupe" dir="ltr">
-            {product.enName}
+          <p className="mt-0.5 flex items-center gap-2 text-[11px] font-serif tracking-wide text-taupe" dir="ltr">
+            <span className="truncate">{product.enName}</span>
+            {product.code && (
+              <span className="shrink-0 rounded-md border border-white/[0.08] bg-white/[0.03] px-1.5 py-0.5 font-mono text-[9px] font-bold text-pearl/45">
+                {t(content.card.codeLabel, { code: product.code })}
+              </span>
+            )}
           </p>
 
           <div className="mt-3 flex items-center gap-1.5" role="group" aria-label="رنگ‌های موجود">
-            <span className="mr-0.5 text-[11px] text-taupe">{toFa(product.colors.length)} رنگ</span>
+            <span className="mr-0.5 text-[11px] text-taupe">
+              {t(content.card.colorsCount, { n: toFa(product.colors.length) })}
+            </span>
             {product.colors.map((c) => (
               <span
                 key={c.hex}

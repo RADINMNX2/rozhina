@@ -2,6 +2,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   Check,
+  ChevronDown,
+  ChevronUp,
   ClipboardCopy,
   CloudCog,
   Download,
@@ -9,16 +11,19 @@ import {
   ImageIcon,
   Lock,
   Package,
+  PenLine,
   Plus,
   RotateCcw,
   Save,
   Settings2,
   Trash2,
   Upload,
+  Wand2,
   X,
 } from 'lucide-react';
 import { useProducts } from '../../context/ProductsContext';
 import { useSettings } from '../../context/SettingsContext';
+import { useContent } from '../../context/ContentContext';
 import { formatPrice, toFa } from '../../utils/format';
 
 const ADMIN_PIN = 'Rozhina8962';
@@ -94,6 +99,7 @@ export const serializeProducts = (products) => {
         `    id: ${p.id},`,
         `    name: ${q(p.name)},`,
         `    enName: ${q(p.enName)},`,
+        `    code: ${q(p.code)},`,
         `    fabric: ${q(p.fabric)},`,
         `    dimensions: ${q(p.dimensions)},`,
         `    ${colors},`,
@@ -149,6 +155,9 @@ export const serializeConstants = (s) => [
   '',
   `export const SUPPORT_ID = ${q(s.supportId)};`,
 ].join('\n');
+
+export const serializeContent = (c) =>
+  [`export const CONTENT = ${JSON.stringify(c, null, 2)};`, '', 'export default CONTENT;'].join('\n');
 
 /* ---------------- GitHub REST ---------------- */
 async function ghGetFile(pat, owner, repo, path, branch) {
@@ -315,6 +324,7 @@ const PinGate = ({ onSuccess }) => {
 const EMPTY_DRAFT = {
   name: '',
   enName: '',
+  code: '',
   fabric: '',
   dimensions: '',
   price: '',
@@ -372,6 +382,7 @@ const ProductEditor = ({ product, onClose, onSave }) => {
       ? {
           name: product.name,
           enName: product.enName,
+          code: product.code ?? '',
           fabric: product.fabric,
           dimensions: product.dimensions,
           price: String(product.price ?? ''),
@@ -410,6 +421,7 @@ const ProductEditor = ({ product, onClose, onSave }) => {
     onSave({
       name: draft.name.trim(),
       enName: draft.enName.trim(),
+      code: draft.code.trim(),
       fabric: draft.fabric.trim() || 'ابریشم',
       dimensions: draft.dimensions.trim(),
       price: Number(draft.price) || 0,
@@ -486,6 +498,14 @@ const ProductEditor = ({ product, onClose, onSave }) => {
                 value={draft.enName}
                 onChange={(e) => set('enName', e.target.value)}
                 placeholder="Twilly Silk"
+                dir="ltr"
+              />
+            </Field>
+            <Field label="کد محصول (اختیاری)" hint="مثلاً برای «روسری فلان» کد xx-x بگذارید">
+              <TextInput
+                value={draft.code}
+                onChange={(e) => set('code', e.target.value)}
+                placeholder="مثلاً RS-204"
                 dir="ltr"
               />
             </Field>
@@ -945,6 +965,11 @@ const ProductsTab = ({ pushRef }) => {
               </div>
               <p className="mt-1 text-[11px] text-taupe" dir="ltr">
                 {p.enName}
+                {p.code && (
+                  <span className="mr-2 rounded-md border border-white/[0.08] bg-white/[0.03] px-1.5 py-0.5 font-mono text-[10px] text-pearl/45" dir="ltr">
+                    کد {p.code}
+                  </span>
+                )}
               </p>
               <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px]">
                 <span className="font-extrabold text-gold">
@@ -1103,6 +1128,312 @@ const SettingsTab = ({ pushRef }) => {
   );
 };
 
+/* ---------------- content tab ---------------- */
+const CField = ({ label, hint, value, onChange, type = 'text', dir = 'auto' }) => (
+  <Field label={label} hint={hint}>
+    {type === 'area' ? (
+      <textarea
+        value={value ?? ''}
+        onChange={(e) => onChange(e.target.value)}
+        rows={3}
+        dir={dir}
+        className="lux-input resize-none text-sm leading-6"
+      />
+    ) : (
+      <TextInput value={value ?? ''} onChange={(e) => onChange(e.target.value)} dir={dir} />
+    )}
+  </Field>
+);
+
+const CListEditor = ({ items, onList, fields }) => {
+  const move = (i, d) => {
+    const next = [...items];
+    const j = i + d;
+    if (j < 0 || j >= next.length) return;
+    [next[i], next[j]] = [next[j], next[i]];
+    onList(next);
+  };
+
+  return (
+    <div className="space-y-2.5">
+      {items.map((item, i) => (
+        <div key={i} className="rounded-xl border border-white/[0.07] bg-white/[0.02] p-3">
+          <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+            {fields.map((f) => (
+              <Field key={f.key} label={f.label}>
+                <TextInput
+                  value={item?.[f.key] ?? ''}
+                  onChange={(e) =>
+                    onList(items.map((it, x) => (x === i ? { ...it, [f.key]: e.target.value } : it)))
+                  }
+                  dir={f.dir ?? 'rtl'}
+                  placeholder={f.placeholder}
+                />
+              </Field>
+            ))}
+          </div>
+          <div className="mt-2.5 flex items-center gap-1.5">
+            <button
+              type="button"
+              aria-label="بالا بردن"
+              disabled={i === 0}
+              onClick={() => move(i, -1)}
+              className="lux-chip !px-2.5 !py-1.5 disabled:opacity-30"
+            >
+              <ChevronUp size={12} />
+            </button>
+            <button
+              type="button"
+              aria-label="پایین بردن"
+              disabled={i === items.length - 1}
+              onClick={() => move(i, 1)}
+              className="lux-chip !px-2.5 !py-1.5 disabled:opacity-30"
+            >
+              <ChevronDown size={12} />
+            </button>
+            <button
+              type="button"
+              aria-label="حذف مورد"
+              onClick={() => onList(items.filter((_, x) => x !== i))}
+              className="lux-chip !px-2.5 !py-1.5 hover:!border-terracotta/40 hover:!text-[#F0A888]"
+            >
+              <Trash2 size={12} />
+            </button>
+          </div>
+        </div>
+      ))}
+      <button
+        type="button"
+        onClick={() => onList([...items, {}])}
+        className="flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-white/15 px-4 py-2.5 text-[11px] font-bold text-pearl/60 transition-all duration-300 hover:border-gold/40 hover:text-gold active:scale-[0.99]"
+      >
+        <Plus size={12} strokeWidth={2.2} />
+        افزودن مورد جدید
+      </button>
+    </div>
+  );
+};
+
+const ContentTab = ({ pushRef }) => {
+  const { content, updateContent, resetContent } = useContent();
+
+  const set = (key, patch) => updateContent({ [key]: patch });
+  const setIn = (objKey, fieldKey, v) => set(objKey, { ...content[objKey], [fieldKey]: v });
+
+  const Sub = ({ label }) => (
+    <p className="mb-2.5 mt-5 flex items-center gap-2 text-[11px] font-extrabold text-gold/85 first:mt-0">
+      <span className="h-px w-4 bg-gold/40" />
+      {label}
+    </p>
+  );
+
+  return (
+    <div className="space-y-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+      <Panel
+        title="متن‌های کل سایت"
+        icon={PenLine}
+        actions={
+          <button
+            type="button"
+            onClick={() => {
+              resetContent();
+              pushRef?.current?.('success', 'همهٔ متن‌ها به پیش‌فرض بازگشت');
+            }}
+            className={`${PILL_BTN} !px-3 !py-1.5 !text-[10px] border-white/10 text-pearl/60 hover:border-gold/40 hover:text-gold`}
+          >
+            <Wand2 size={11} strokeWidth={2} />
+            بازنشانی همه
+          </button>
+        }
+      >
+        <p className="mb-4 rounded-xl border border-white/[0.06] bg-white/[0.02] px-4 py-3 text-[11px] leading-6 text-taupe">
+          هر متنی که تغییر دهید همان لحظه در سایت اعمال می‌شود و چند ثانیه بعد به‌صورت خودکار روی گیت‌هاب منتشر شده و
+          سایت بروزرسانی می‌شود. مکان‌نماهای{' '}
+          <b className="font-mono text-gold/85" dir="ltr">
+            {`{n}، {total}، {q}، {code}`}
+          </b>{' '}
+          به‌صورت خودکار با عدد/متن مرتبط پر می‌شوند.
+        </p>
+
+        <Sub label="بنر اصلی سایت" />
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <CField label="متن کوچک بالای بنر" value={content.hero?.eyebrow} onChange={(v) => setIn('hero', 'eyebrow', v)} />
+          <CField label="تیتر بزرگ — خط اول" value={content.hero?.title1} onChange={(v) => setIn('hero', 'title1', v)} />
+          <CField label="تیتر بزرگ — خط دوم (زرین)" value={content.hero?.title2} onChange={(v) => setIn('hero', 'title2', v)} />
+          <div className="sm:col-span-2">
+            <CField label="زیرتیتر بنر" type="area" value={content.hero?.subtitle} onChange={(v) => setIn('hero', 'subtitle', v)} />
+          </div>
+          <CField label="متن دکمه اصلی" value={content.hero?.ctaPrimary} onChange={(v) => setIn('hero', 'ctaPrimary', v)} />
+          <CField label="متن دکمه دوم" value={content.hero?.ctaSecondary} onChange={(v) => setIn('hero', 'ctaSecondary', v)} />
+        </div>
+
+        <Sub label="بخش کالکشن" />
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <CField label="برچسب لاتین" hint="متن‌های انگلیسی یا خلاصهٔ بالای عنوان" dir="ltr" value={content.collection?.eyebrow} onChange={(v) => setIn('collection', 'eyebrow', v)} />
+          <CField label="عنوان کالکشن" value={content.collection?.title} onChange={(v) => setIn('collection', 'title', v)} />
+          <div className="sm:col-span-2">
+            <CField label="زیرعنوان کالکشن" type="area" value={content.collection?.subtitle} onChange={(v) => setIn('collection', 'subtitle', v)} />
+          </div>
+        </div>
+
+        <Sub label="متن پیام «محصولی یافت نشد»" />
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <CField label="عنوان" value={content.productGrid?.emptyTitle} onChange={(v) => setIn('productGrid', 'emptyTitle', v)} />
+          <CField label="توضیح" type="area" value={content.productGrid?.emptyText} onChange={(v) => setIn('productGrid', 'emptyText', v)} />
+        </div>
+      </Panel>
+
+      <Panel title="مزایا (کارت‌های بالای فروشگاه)" icon={PenLine}>
+        <CListEditor
+          items={content.features ?? []}
+          onList={(next) => set('features', next)}
+          fields={[
+            { key: 'title', label: 'عنوان مزیت' },
+            { key: 'text', label: 'توضیح مزیت' },
+          ]}
+        />
+      </Panel>
+
+      <Panel title="کارت محصول در کالکشن" icon={PenLine}>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <CField label="متن دکمه «افزودن به سبد»" value={content.card?.addToCart} onChange={(v) => setIn('card', 'addToCart', v)} />
+          <CField label="نشان موفقیت افزودن" value={content.card?.addedToCart} onChange={(v) => setIn('card', 'addedToCart', v)} />
+          <CField label="نشان کد محصول" hint="با «{code}» مقدار کد محصول جایگزین می‌شود" value={content.card?.codeLabel} onChange={(v) => setIn('card', 'codeLabel', v)} />
+          <CField label="نشان موجودی کم" hint="با «{n}» عدد جایگزین می‌شود" value={content.card?.lowStock} onChange={(v) => setIn('card', 'lowStock', v)} />
+          <CField label="تعداد رنگ‌ها" hint="با «{n}» تعداد جایگزین می‌شود" value={content.card?.colorsCount} onChange={(v) => setIn('card', 'colorsCount', v)} />
+        </div>
+      </Panel>
+
+      <Panel title="پنجرهٔ نمایش سریع محصول" icon={PenLine}>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <CField label="برچسب کد محصول" hint="با «{code}» جایگزین می‌شود" value={content.quickView?.codeLabel} onChange={(v) => setIn('quickView', 'codeLabel', v)} />
+          <CField label="برچسب «ابعاد»" value={content.quickView?.dimensionsLabel} onChange={(v) => setIn('quickView', 'dimensionsLabel', v)} />
+          <CField label="برچسب «رنگ»" value={content.quickView?.colorLabel} onChange={(v) => setIn('quickView', 'colorLabel', v)} />
+          <CField label="برچسب «موجودی انبار»" value={content.quickView?.stockLabel} onChange={(v) => setIn('quickView', 'stockLabel', v)} />
+          <CField label="متن موجودی کم" hint="با «{n}» جایگزین می‌شود" value={content.quickView?.lowStock} onChange={(v) => setIn('quickView', 'lowStock', v)} />
+          <CField label="متن موجودی عادی" hint="با «{n}» جایگزین می‌شود" value={content.quickView?.inStock} onChange={(v) => setIn('quickView', 'inStock', v)} />
+          <CField label="متن دکمه افزودن" value={content.quickView?.addToCart} onChange={(v) => setIn('quickView', 'addToCart', v)} />
+          <CField label="نشان موفقیت افزودن" value={content.quickView?.addedToCart} onChange={(v) => setIn('quickView', 'addedToCart', v)} />
+          <div className="sm:col-span-2">
+            <CField label="یادداشت ارسال رایگان" type="area" value={content.quickView?.shippingNote} onChange={(v) => setIn('quickView', 'shippingNote', v)} />
+          </div>
+        </div>
+      </Panel>
+
+      <Panel title="سبد خرید و پیام افزودن" icon={PenLine}>
+        <Sub label="سبد خرید" />
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <CField label="عنوان سبد" value={content.cart?.title} onChange={(v) => setIn('cart', 'title', v)} />
+          <CField label="عنوان سبد خالی" value={content.cart?.emptyTitle} onChange={(v) => setIn('cart', 'emptyTitle', v)} />
+          <CField label="زیرعنوان سبد خالی" value={content.cart?.emptySubtitle} onChange={(v) => setIn('cart', 'emptySubtitle', v)} />
+          <CField label="دکمه «مشاهده کالکشن»" value={content.cart?.viewCollection} onChange={(v) => setIn('cart', 'viewCollection', v)} />
+          <CField label="پیام تا ارسال رایگان" hint="با «{total}» مبلغ جایگزین می‌شود" value={content.cart?.freeShippingLeft} onChange={(v) => setIn('cart', 'freeShippingLeft', v)} />
+          <CField label="پیام ارسال رایگان فعال" value={content.cart?.freeShippingActive} onChange={(v) => setIn('cart', 'freeShippingActive', v)} />
+          <CField label="برچسب مجموع فاکتور" value={content.cart?.subtotal} onChange={(v) => setIn('cart', 'subtotal', v)} />
+          <CField label="یادداشت پایین سبد" type="area" value={content.cart?.checkoutNote} onChange={(v) => setIn('cart', 'checkoutNote', v)} />
+          <CField label="دکمه سفارش واتس‌اپ" value={content.cart?.checkoutButton} onChange={(v) => setIn('cart', 'checkoutButton', v)} />
+          <CField label="نشان اعتماد ۱" value={content.cart?.trustBadge1} onChange={(v) => setIn('cart', 'trustBadge1', v)} />
+          <CField label="نشان اعتماد ۲" value={content.cart?.trustBadge2} onChange={(v) => setIn('cart', 'trustBadge2', v)} />
+        </div>
+        <Sub label="پیام افزودن به سبد (popup)" />
+        <CField label="متن پیام" value={content.cartToast?.title} onChange={(v) => setIn('cartToast', 'title', v)} />
+      </Panel>
+
+      <Panel title="منوی بالای سایت" icon={PenLine}>
+        <CListEditor
+          items={content.nav ?? []}
+          onList={(next) => set('nav', next)}
+          fields={[
+            { key: 'label', label: 'عنوان منو' },
+            { key: 'href', label: 'لینک', dir: 'ltr', placeholder: '#collection' },
+          ]}
+        />
+        <Sub label="نکتهٔ ارسال رایگان در منوی موبایل" />
+        <CField label="متن نکته" type="area" value={content.menu?.shippingNote} onChange={(v) => setIn('menu', 'shippingNote', v)} />
+      </Panel>
+
+      <Panel title="لوک‌بوک و خبرنامه" icon={PenLine}>
+        <Sub label="لوک‌بوک" />
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <CField label="عنوان بخش" value={content.lookbook?.title} onChange={(v) => setIn('lookbook', 'title', v)} />
+          <div className="sm:col-span-2">
+            <CField label="زیرعنوان" type="area" value={content.lookbook?.subtitle} onChange={(v) => setIn('lookbook', 'subtitle', v)} />
+          </div>
+        </div>
+        <div className="mt-4">
+          <Sub label="سبک‌های لوک‌بوک" />
+          <div className="mt-2.5">
+            <CListEditor
+              items={content.lookbook?.shots ?? []}
+              onList={(next) => set('lookbook', { ...content.lookbook, shots: next })}
+              fields={[
+                { key: 'label', label: 'عنوان استایل' },
+                { key: 'sub', label: 'زیرعنوان' },
+              ]}
+            />
+          </div>
+        </div>
+        <Sub label="خبرنامه" />
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <CField label="عنوان" type="area" value={content.newsletter?.title} onChange={(v) => setIn('newsletter', 'title', v)} />
+          <CField label="زیرعنوان" type="area" value={content.newsletter?.subtitle} onChange={(v) => setIn('newsletter', 'subtitle', v)} />
+          <CField label="پیام موفقیت" type="area" value={content.newsletter?.success} onChange={(v) => setIn('newsletter', 'success', v)} />
+          <CField label="متن دکمه" value={content.newsletter?.button} onChange={(v) => setIn('newsletter', 'button', v)} />
+        </div>
+      </Panel>
+
+      <Panel title="فوتر (پایین سایت)" icon={PenLine}>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="sm:col-span-2">
+            <CField label="توضیح برند" type="area" value={content.footer?.description} onChange={(v) => setIn('footer', 'description', v)} />
+          </div>
+          <CField label="آدرس فروشگاه" type="area" value={content.footer?.address} onChange={(v) => setIn('footer', 'address', v)} />
+          <CField label="متن کپی‌رایت" value={content.footer?.copyright} onChange={(v) => setIn('footer', 'copyright', v)} />
+          <CField label="شعار پایانی" value={content.footer?.tagline} onChange={(v) => setIn('footer', 'tagline', v)} />
+          <CField label="عنوان ستون «دسترسی سریع»" value={content.footer?.headingQuick} onChange={(v) => setIn('footer', 'headingQuick', v)} />
+          <CField label="عنوان ستون «راهنمای خرید»" value={content.footer?.headingHelp} onChange={(v) => setIn('footer', 'headingHelp', v)} />
+          <CField label="عنوان ستون «تماس با گالری»" value={content.footer?.headingContact} onChange={(v) => setIn('footer', 'headingContact', v)} />
+        </div>
+        <Sub label="لینک‌های دسترسی سریع" />
+        <CListEditor
+          items={content.footer?.quickLinks ?? []}
+          onList={(next) => set('footer', { ...content.footer, quickLinks: next })}
+          fields={[
+            { key: 'label', label: 'عنوان لینک' },
+            { key: 'href', label: 'لینک', dir: 'ltr', placeholder: '#collection' },
+          ]}
+        />
+        <Sub label="لینک‌های راهنمای خرید" />
+        <CListEditor
+          items={content.footer?.helpLinks ?? []}
+          onList={(next) => set('footer', { ...content.footer, helpLinks: next })}
+          fields={[
+            { key: 'label', label: 'عنوان لینک' },
+            { key: 'href', label: 'لینک', dir: 'ltr', placeholder: '#collection' },
+          ]}
+        />
+      </Panel>
+
+      <Panel title="جستجو و پیام‌های واتس‌اپ" icon={PenLine}>
+        <Sub label="جستجو" />
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <CField label="متن راهنما در کادر جستجو" value={content.search?.placeholder} onChange={(v) => setIn('search', 'placeholder', v)} />
+          <CField label="راهنمای قبل از تایپ" type="area" value={content.search?.hint} onChange={(v) => setIn('search', 'hint', v)} />
+          <CField label="متن «نتیجه‌ای یافت نشد»" hint="با «{q}» عبارت جستجو جایگزین می‌شود" value={content.search?.noResults} onChange={(v) => setIn('search', 'noResults', v)} />
+          <CField label="متن شمارندهٔ محصولات" hint="با «{n}» تعداد جایگزین می‌شود" value={content.search?.resultCount} onChange={(v) => setIn('search', 'resultCount', v)} />
+        </div>
+        <Sub label="پیام‌های واتس‌اپ" />
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <CField label="متن پیام سفارش — شروع" value={content.whatsapp?.orderGreeting} onChange={(v) => setIn('whatsapp', 'orderGreeting', v)} />
+          <CField label="متن جمع فاکتور" hint="با «{total}» مبلغ جایگزین می‌شود" value={content.whatsapp?.orderTotal} onChange={(v) => setIn('whatsapp', 'orderTotal', v)} />
+          <CField label="متن پیام سفارش — پایان" type="area" value={content.whatsapp?.orderFooter} onChange={(v) => setIn('whatsapp', 'orderFooter', v)} />
+          <CField label="متن پیش‌نمایش پیام واتس‌اپ شناور" type="area" value={content.whatsapp?.floatingPrefill} onChange={(v) => setIn('whatsapp', 'floatingPrefill', v)} />
+        </div>
+      </Panel>
+    </div>
+  );
+};
+
 /* ---------------- github tab ---------------- */
 const readGhMeta = () => {
   try {
@@ -1118,6 +1449,7 @@ const readGhMeta = () => {
 const GithubTab = ({ pushRef }) => {
   const { products } = useProducts();
   const { settings } = useSettings();
+  const { content } = useContent();
   const [meta, setMeta] = useState(readGhMeta);
   const [status, setStatus] = useState('idle');
   const [statusMsg, setStatusMsg] = useState('');
@@ -1151,9 +1483,17 @@ const GithubTab = ({ pushRef }) => {
         serializeConstants(settings),
         'chore(content): sync store settings from Rozhina Admin Studio', meta.branch,
       );
+      await ghPutFile(
+        meta.pat, meta.owner, meta.repo, 'src/data/content.js',
+        serializeContent(content),
+        'chore(content): sync site texts from Rozhina Admin Studio', meta.branch,
+      );
       setStatus('ok');
       setStatusMsg('منتشر شد! دیپلوی خودکار در حال اجراست…');
-      localStorage.setItem(LAST_SYNC_KEY, `${serializeProducts(products)}\n___\n${serializeConstants(settings)}`);
+      localStorage.setItem(
+        LAST_SYNC_KEY,
+        `${serializeProducts(products)}\n___\n${serializeConstants(settings)}\n___\n${serializeContent(content)}`,
+      );
       pushRef?.current?.('success', 'تغییرات در GitHub منتشر شد — سایت به‌زودی بروزرسانی می‌شود');
     } catch (err) {
       setStatus('error');
@@ -1168,6 +1508,7 @@ const GithubTab = ({ pushRef }) => {
       savedAt: new Date().toISOString(),
       products,
       settings,
+      content,
     };
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
@@ -1204,7 +1545,9 @@ const GithubTab = ({ pushRef }) => {
         const data = JSON.parse(String(reader.result));
         if (Array.isArray(data.products)) {
           window.dispatchEvent(
-            new CustomEvent('rozhina:restore', { detail: { products: data.products, settings: data.settings } }),
+            new CustomEvent('rozhina:restore', {
+              detail: { products: data.products, settings: data.settings, content: data.content },
+            }),
           );
           pushRef?.current?.('success', `پشتیبان بازیابی شد (${toFa(data.products.length)} محصول)`);
         } else {
@@ -1320,13 +1663,15 @@ const GithubTab = ({ pushRef }) => {
 const AutoPublisher = ({ pushRef }) => {
   const { products } = useProducts();
   const { settings } = useSettings();
+  const { content } = useContent();
   const timer = useRef(null);
   const inflight = useRef(false);
   const sizeBlocked = useRef('');
 
   const currentPayload = useCallback(
-    () => `${serializeProducts(products)}\n___\n${serializeConstants(settings)}`,
-    [products, settings],
+    () =>
+      `${serializeProducts(products)}\n___\n${serializeConstants(settings)}\n___\n${serializeContent(content)}`,
+    [products, settings, content],
   );
 
   const publish = useCallback(async () => {
@@ -1352,6 +1697,11 @@ const AutoPublisher = ({ pushRef }) => {
         serializeConstants(settings),
         'chore(content): auto-sync settings from Rozhina Admin Studio', meta.branch,
       );
+      await ghPutFile(
+        meta.pat, meta.owner, meta.repo, 'src/data/content.js',
+        serializeContent(content),
+        'chore(content): auto-sync site texts from Rozhina Admin Studio', meta.branch,
+      );
       localStorage.setItem(LAST_SYNC_KEY, payload);
       pushRef?.current?.('success', 'تغییرات خودکار روی سرور منتشر شد — سایت در حال بروزرسانی است');
     } catch (err) {
@@ -1367,7 +1717,7 @@ const AutoPublisher = ({ pushRef }) => {
     ) {
       timer.current = window.setTimeout(publish, 1500);
     }
-  }, [currentPayload, products, settings, pushRef]);
+  }, [currentPayload, products, settings, content, pushRef]);
 
   useEffect(() => {
     const meta = readGhMeta();
@@ -1377,14 +1727,16 @@ const AutoPublisher = ({ pushRef }) => {
     const seedOrCheck = async () => {
       if (cancelled || localStorage.getItem(LAST_SYNC_KEY)) return;
       try {
-        const [serverProducts, serverConstants] = await Promise.all([
+        const [serverProducts, serverConstants, serverContent] = await Promise.all([
           ghFetchFile(meta.pat, meta.owner, meta.repo, 'src/data/productsData.js', meta.branch),
           ghFetchFile(meta.pat, meta.owner, meta.repo, 'src/data/constants.js', meta.branch),
+          ghFetchFile(meta.pat, meta.owner, meta.repo, 'src/data/content.js', meta.branch),
         ]);
         if (cancelled) return;
         const drifted =
           (serverProducts !== null && serverProducts !== serializeProducts(products)) ||
-          (serverConstants !== null && serverConstants !== serializeConstants(settings));
+          (serverConstants !== null && serverConstants !== serializeConstants(settings)) ||
+          (serverContent !== null && serverContent !== serializeContent(content));
         if (drifted) {
           publish();
           return;
@@ -1404,7 +1756,7 @@ const AutoPublisher = ({ pushRef }) => {
       cancelled = true;
       window.clearTimeout(timer.current);
     };
-  }, [products, settings, currentPayload, publish]);
+  }, [products, settings, content, currentPayload, publish]);
 
   return null;
 };
@@ -1412,6 +1764,7 @@ const AutoPublisher = ({ pushRef }) => {
 /* ---------------- shell ---------------- */
 const TABS = [
   { key: 'products', label: 'محصولات', icon: Package },
+  { key: 'content', label: 'متن‌های سایت', icon: PenLine },
   { key: 'settings', label: 'تنظیمات سایت', icon: Settings2 },
   { key: 'github', label: 'تنظیمات گیت‌هاب', icon: Github },
 ];
@@ -1419,6 +1772,7 @@ const TABS = [
 export const AdminStudio = () => {
   const { importProducts } = useProducts();
   const { replaceSettings } = useSettings();
+  const { replaceContent } = useContent();
   const [open, setOpen] = useState(false);
   const [unlocked, setUnlocked] = useState(false);
   const [tab, setTab] = useState('products');
@@ -1461,13 +1815,14 @@ export const AdminStudio = () => {
     window.addEventListener('rozhina:restore', (e) => {
       importProducts(e.detail?.products);
       if (e.detail?.settings) replaceSettings(e.detail.settings);
+      if (e.detail?.content) replaceContent(e.detail.content);
     });
     return () => {
       window.removeEventListener('keydown', onKey);
       window.removeEventListener('hashchange', onHash);
       window.removeEventListener('rozhina:open-admin', onCustom);
     };
-  }, [openAdmin, importProducts, replaceSettings]);
+  }, [openAdmin, importProducts, replaceSettings, replaceContent]);
 
   const unlock = useCallback(() => {
     sessionStorage.setItem(UNLOCK_KEY, '1');
@@ -1554,6 +1909,7 @@ export const AdminStudio = () => {
 
                   <div className="mt-5">
                     {tab === 'products' && <ProductsTab pushRef={pushRef} />}
+                    {tab === 'content' && <ContentTab pushRef={pushRef} />}
                     {tab === 'settings' && <SettingsTab pushRef={pushRef} />}
                     {tab === 'github' && <GithubTab pushRef={pushRef} />}
                   </div>

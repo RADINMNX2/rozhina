@@ -1,12 +1,14 @@
 import { useSettings } from '../context/SettingsContext';
+import { useContent } from '../context/ContentContext';
 import { buildWhatsAppLink } from '../utils/whatsapp';
 
 export const FloatingWhatsApp = () => {
   const { settings } = useSettings();
+  const { content } = useContent();
   return (
     <a
       href={buildWhatsAppLink(
-        'سلام به گالری روژینا، از سایت با شما آشنا شدم و سوال داشتم.',
+        content.whatsapp.floatingPrefill ?? 'سلام به گالری روژینا، از سایت با شما آشنا شدم و سوال داشتم.',
         settings.whatsapp,
       )}
       target="_blank"

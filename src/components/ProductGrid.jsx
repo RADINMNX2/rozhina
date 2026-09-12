@@ -1,17 +1,20 @@
 import { SearchX } from 'lucide-react';
 import { RozhinaProductCard } from './RozhinaProductCard';
 import { Stagger, StaggerItem } from './motion/Reveal';
+import { useContent } from '../context/ContentContext';
 
 export const ProductGrid = ({ products, onQuickView }) => {
+  const { content } = useContent();
+
   if (products.length === 0) {
     return (
       <div className="flex flex-col items-center gap-4 py-20 text-center">
         <span className="flex h-16 w-16 items-center justify-center rounded-full border border-white/10 bg-white/[0.03] text-taupe">
           <SearchX size={26} strokeWidth={1.5} />
         </span>
-        <h3 className="text-lg font-bold text-pearl">محصولی یافت نشد</h3>
+        <h3 className="text-lg font-bold text-pearl">{content.productGrid.emptyTitle}</h3>
         <p className="max-w-sm text-sm leading-7 text-taupe">
-          فیلترها را تغییر دهید یا عبارت دیگری را جستجو کنید تا زیبایی کالکشن روژینا را ببینید.
+          {content.productGrid.emptyText}
         </p>
       </div>
     );

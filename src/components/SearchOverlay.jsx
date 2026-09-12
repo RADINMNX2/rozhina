@@ -1,11 +1,15 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Search, X } from 'lucide-react';
 import { useProducts } from '../context/ProductsContext';
+import { useContent } from '../context/ContentContext';
 import { formatPrice, toFa } from '../utils/format';
+import { t } from '../utils/text';
 import { withImageFallback } from '../utils/imageFallback';
 
 export const SearchOverlay = ({ open, onClose, onSelect }) => {
   const { products } = useProducts();
+  const { content } = useContent();
+  const c = content.search ?? {};
   const [query, setQuery] = useState('');
   const inputRef = useRef(null);
 
@@ -54,7 +58,7 @@ export const SearchOverlay = ({ open, onClose, onSelect }) => {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             type="text"
-            placeholder="جستجوی شال، روسری، ابریشم، رنگ…"
+            placeholder={c.placeholder}
             className="w-full bg-transparent text-lg font-medium text-pearl outline-none placeholder:text-taupe/60 md:text-xl"
           />
           <button
@@ -70,11 +74,11 @@ export const SearchOverlay = ({ open, onClose, onSelect }) => {
         <div className="mx-auto mt-8 w-full max-w-2xl overflow-y-auto">
           {query.trim() === '' ? (
             <p className="py-10 text-center text-sm leading-7 text-taupe">
-              عبارت موردنظرتان را تایپ کنید؛ مثلاً «زمردی» یا «ابریشم».
+              {c.hint}
             </p>
           ) : results.length === 0 ? (
             <p className="py-10 text-center text-sm text-taupe">
-              نتیجه‌ای برای «{query}» یافت نشد.
+              {t(c.noResults, { q: query })}
             </p>
           ) : (
             <ul className="divide-y divide-white/[0.06]">
@@ -113,7 +117,7 @@ export const SearchOverlay = ({ open, onClose, onSelect }) => {
         </div>
 
         <p className="mt-auto pt-6 text-center text-[11px] text-taupe">
-          {toFa(products.length)} محصول در کالکشن روژینا
+          {t(c.resultCount, { n: toFa(products.length) })}
         </p>
       </div>
     </div>

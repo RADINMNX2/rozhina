@@ -4,6 +4,8 @@ import { Check, Ruler, ShoppingBag, Truck, X } from 'lucide-react';
 import { badgeStyle } from '../data/productsData';
 import { formatPrice, toFa } from '../utils/format';
 import { useCart } from '../context/CartContext';
+import { useContent } from '../context/ContentContext';
+import { t } from '../utils/text';
 import { FabricMagnifier } from './FabricMagnifier';
 import { MagneticButton } from './MagneticButton';
 
@@ -22,6 +24,7 @@ function useIsMobile() {
 
 export const ProductQuickViewModal = ({ product, onClose }) => {
   const { addItem, setColor } = useCart();
+  const { content: c } = useContent();
   const isMobile = useIsMobile();
   const scrollRef = useRef(null);
   const [selectedHex, setSelectedHex] = useState(null);
@@ -100,6 +103,14 @@ export const ProductQuickViewModal = ({ product, onClose }) => {
           <p className="mt-1.5 text-xs font-serif tracking-wide text-taupe" dir="ltr">
             {product.enName}
           </p>
+          {product.code && (
+            <p
+              className="mt-1.5 inline-flex items-center gap-1.5 rounded-full border border-white/[0.08] bg-white/[0.03] px-2.5 py-1 text-[10px] font-bold text-pearl/50"
+              dir="ltr"
+            >
+              {t(c.quickView.codeLabel, { code: product.code })}
+            </p>
+          )}
         </div>
 
         <p className="text-sm leading-7 text-pearl/70">{product.description}</p>
@@ -107,14 +118,14 @@ export const ProductQuickViewModal = ({ product, onClose }) => {
         <div className="flex flex-col gap-3 rounded-xl border border-white/[0.06] bg-white/[0.02] px-4 py-3">
           <div className="flex items-center gap-2.5 text-xs text-taupe">
             <Ruler size={14} className="text-gold" strokeWidth={1.7} />
-            <span>ابعاد:&nbsp;</span>
+            <span>{t(c.quickView.dimensionsLabel)}&nbsp;</span>
             <span className="font-semibold text-pearl">{product.dimensions}</span>
           </div>
         </div>
 
         <div>
           <p className="text-[11px] text-taupe">
-            رنگ: <span className="font-semibold text-pearl">{selectedLabel}</span>
+            {t(c.quickView.colorLabel)} <span className="font-semibold text-pearl">{selectedLabel}</span>
           </p>
           <div className="mt-2.5 flex items-center gap-2.5" role="group" aria-label="انتخاب رنگ">
             {product.colors.map((c) => {
@@ -139,13 +150,13 @@ export const ProductQuickViewModal = ({ product, onClose }) => {
         </div>
 
         <div className="flex items-center justify-between rounded-xl border border-white/[0.06] bg-white/[0.02] px-4 py-3">
-          <span className="text-xs text-taupe">موجودی انبار</span>
+          <span className="text-xs text-taupe">{c.quickView.stockLabel}</span>
           <span
             className={`text-sm font-bold ${lowStock ? 'text-terracotta' : 'text-pearl'}`}
           >
             {lowStock
-              ? `تنها ${toFa(product.quantity)} عدد باقی مانده`
-              : `${toFa(product.quantity)} عدد موجود`}
+              ? t(c.quickView.lowStock, { n: toFa(product.quantity) })
+              : t(c.quickView.inStock, { n: toFa(product.quantity) })}
           </span>
         </div>
 
@@ -174,7 +185,7 @@ export const ProductQuickViewModal = ({ product, onClose }) => {
                   className="flex items-center justify-center gap-2"
                 >
                   <Check size={17} strokeWidth={3} />
-                  به سبد خرید اضافه شد
+                  {t(c.quickView.addedToCart)}
                 </motion.span>
               ) : (
                 <motion.span
@@ -186,7 +197,7 @@ export const ProductQuickViewModal = ({ product, onClose }) => {
                   className="flex w-full items-center justify-center gap-2.5"
                 >
                   <ShoppingBag size={16} strokeWidth={2} />
-                  افزودن به سبد خرید
+                  {t(c.quickView.addToCart)}
                   <span className="whitespace-nowrap rounded-full bg-obsidian/25 px-2.5 py-1 text-xs font-bold tracking-wide">
                     {formatPrice(product.price)}
                   </span>
@@ -197,7 +208,7 @@ export const ProductQuickViewModal = ({ product, onClose }) => {
 
           <p className="flex items-center justify-center gap-2 text-[11px] text-taupe">
             <Truck size={12} className="text-gold" strokeWidth={1.7} />
-            ارسال رایگان برای خریدهای بالای ۱ میلیون تومان
+            {c.quickView.shippingNote}
           </p>
         </div>
       </div>

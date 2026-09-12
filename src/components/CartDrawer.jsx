@@ -3,7 +3,9 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { Minus, Plus, ShoppingBag, Trash2, X } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useSettings } from '../context/SettingsContext';
+import { useContent } from '../context/ContentContext';
 import { formatPrice, toFa } from '../utils/format';
+import { t } from '../utils/text';
 import { buildOrderMessage, buildWhatsAppLink } from '../utils/whatsapp';
 import { MagneticButton } from './MagneticButton';
 import { withImageFallback } from '../utils/imageFallback';
@@ -13,6 +15,7 @@ const DRAWER_SPRING = { type: 'spring', damping: 32, stiffness: 280, mass: 0.85 
 export const CartDrawer = ({ open, onClose }) => {
   const { items, totalItems, subtotal, increment, decrement, removeItem, setColor } = useCart();
   const { settings } = useSettings();
+  const { content } = useContent();
 
   const threshold = Math.max(Number(settings.freeShippingThreshold) || 0, 0);
 
@@ -33,7 +36,7 @@ export const CartDrawer = ({ open, onClose }) => {
   const progress = threshold > 0 ? Math.min((subtotal / threshold) * 100, 100) : 100;
   const handleCheckout = () => {
     window.open(
-      buildWhatsAppLink(buildOrderMessage(items), settings.whatsapp),
+      buildWhatsAppLink(buildOrderMessage(items, content), settings.whatsapp),
       '_blank',
       'noopener,noreferrer',
     );
@@ -45,7 +48,7 @@ export const CartDrawer = ({ open, onClose }) => {
         <motion.div
           className="fixed inset-0 z-[60]"
           role="dialog"
-          aria-label="سبد خرید"
+          aria-label={content.cart.title}
           aria-modal="true"
         >
           <motion.div
@@ -69,7 +72,7 @@ export const CartDrawer = ({ open, onClose }) => {
               <div className="flex items-center gap-3">
                 <ShoppingBag size={18} strokeWidth={1.5} className="text-gold" />
                 <h2 className="text-base font-bold text-pearl">
-                  سبد خرید <span className="text-taupe">({toFa(totalItems)})</span>
+                  {t(content.cart.title)} <span className="text-taupe">({toFa(totalItems)})</span>
                 </h2>
               </div>
               <button
@@ -86,12 +89,9 @@ export const CartDrawer = ({ open, onClose }) => {
             <div className="border-b border-white/[0.06] bg-white/[0.02] px-6 py-4">
               <p className="text-xs leading-6 text-pearl/75">
                 {remaining > 0 ? (
-                  <>
-                    با خرید <span className="font-bold text-gold">{formatPrice(remaining)}</span>{' '}
-                    تومان دیگر، ارسال رایگان می‌شود
-                  </>
+                  t(content.cart.freeShippingLeft, { total: formatPrice(remaining) })
                 ) : (
-                  <span className="font-bold text-gold">ارسال رایگان شما فعال شد ✓</span>
+                  <span className="font-bold text-gold">{content.cart.freeShippingActive}</span>
                 )}
               </p>
               <div className="mt-2 h-[3px] overflow-hidden rounded-full bg-white/10">
@@ -110,13 +110,13 @@ export const CartDrawer = ({ open, onClose }) => {
                     <ShoppingBag size={24} strokeWidth={1.4} />
                   </span>
                   <div>
-                    <p className="text-sm font-bold text-pearl">سبد خرید شما خالی است</p>
+                    <p className="text-sm font-bold text-pearl">{content.cart.emptyTitle}</p>
                     <p className="mt-1 text-xs leading-6 text-taupe">
-                      زیبایی کالکشن روژینا منتظر شماست
+                      {content.cart.emptySubtitle}
                     </p>
                   </div>
                   <a href="#collection" onClick={onClose} className="btn-gold !py-3 text-xs">
-                    مشاهده کالکشن
+                    {content.cart.viewCollection}
                   </a>
                 </div>
               ) : (
@@ -206,21 +206,21 @@ export const CartDrawer = ({ open, onClose }) => {
             {items.length > 0 && (
               <div className="border-t border-white/[0.06] bg-white/[0.02] px-6 py-5">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-taupe">مجموع فاکتور</span>
+                  <span className="text-taupe">{content.cart.subtotal}</span>
                   <span className="text-lg font-extrabold tracking-tight text-pearl">
                     {formatPrice(subtotal)}
                     <span className="mr-1.5 text-xs font-normal text-taupe">تومان</span>
                   </span>
                 </div>
                 <p className="mt-1 text-[11px] text-taupe">
-                  زمان تحویل و هزینه نهایی پس از هماهنگی در واتس‌اپ اعلام می‌شود.
+                  {content.cart.checkoutNote}
                 </p>
 
                 <MagneticButton
                   onClick={handleCheckout}
                   className="btn-gold btn-shimmer mt-4 w-full"
                 >
-                  سفارش از طریق واتس‌اپ
+                  {content.cart.checkoutButton}
                   <svg
                     viewBox="0 0 24 24"
                     className="ml-0.5 h-4 w-4 fill-current"
@@ -231,9 +231,9 @@ export const CartDrawer = ({ open, onClose }) => {
                 </MagneticButton>
 
                 <div className="mt-3 flex items-center justify-center gap-4 text-[11px] text-taupe">
-                  <span>پرداخت امن هنگام تحویل</span>
+                  <span>{content.cart.trustBadge1}</span>
                   <span className="h-1 w-1 rounded-full bg-gold shadow-[0_0_6px_rgba(226,201,151,0.7)]" />
-                  <span>۷ روز ضمانت بازگشت</span>
+                  <span>{content.cart.trustBadge2}</span>
                 </div>
               </div>
             )}
