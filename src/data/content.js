@@ -35,6 +35,7 @@ export const CONTENT = {
     "addToCart": "افزودن به سبد",
     "addedToCart": "به سبد اضافه شد",
     "lowStock": "تنها {n} عدد",
+    "outOfStock": "ناموجود",
     "colorsCount": "{n} رنگ"
   },
   "quickView": {
@@ -44,6 +45,7 @@ export const CONTENT = {
     "stockLabel": "موجودی انبار",
     "lowStock": "تنها {n} عدد باقی مانده",
     "inStock": "{n} عدد موجود",
+    "outOfStock": "ناموجود",
     "addToCart": "افزودن به سبد خرید",
     "addedToCart": "به سبد خرید اضافه شد",
     "shippingNote": "ارسال رایگان برای خریدهای بالای ۱ میلیون تومان"

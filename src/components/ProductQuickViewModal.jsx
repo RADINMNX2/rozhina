@@ -57,12 +57,14 @@ export const ProductQuickViewModal = ({ product, onClose }) => {
 
   const selectedLabel = product.colors.find((c) => c.hex === selectedHex)?.label;
   const lowStock = product.quantity <= 2;
+  const outOfStock = product.inStock === false || (product.quantity ?? 0) <= 0;
 
   const handleScroll = () => {
     setCanDrag((scrollRef.current?.scrollTop ?? 0) <= 0);
   };
 
   const handleAdd = () => {
+    if (outOfStock) return;
     addItem(product.id, 1);
     setColor(product.id, selectedHex);
     setAdded(true);
@@ -152,11 +154,13 @@ export const ProductQuickViewModal = ({ product, onClose }) => {
         <div className="flex items-center justify-between rounded-xl border border-white/[0.06] bg-white/[0.02] px-4 py-3">
           <span className="text-xs text-taupe">{c.quickView.stockLabel}</span>
           <span
-            className={`text-sm font-bold ${lowStock ? 'text-terracotta' : 'text-pearl'}`}
+            className={`text-sm font-bold ${outOfStock ? 'text-terracotta' : lowStock ? 'text-terracotta' : 'text-pearl'}`}
           >
-            {lowStock
-              ? t(c.quickView.lowStock, { n: toFa(product.quantity) })
-              : t(c.quickView.inStock, { n: toFa(product.quantity) })}
+            {outOfStock
+              ? t(c.quickView.outOfStock)
+              : lowStock
+                ? t(c.quickView.lowStock, { n: toFa(product.quantity) })
+                : t(c.quickView.inStock, { n: toFa(product.quantity) })}
           </span>
         </div>
 
@@ -173,8 +177,14 @@ export const ProductQuickViewModal = ({ product, onClose }) => {
             )}
           </div>
 
-          <MagneticButton onClick={handleAdd} className="btn-gold-modern w-full">
-            <AnimatePresence mode="wait" initial={false}>
+          <MagneticButton onClick={handleAdd} disabled={outOfStock} className="btn-gold-modern w-full disabled:cursor-not-allowed disabled:opacity-40">
+            {outOfStock ? (
+              <span className="flex w-full items-center justify-center gap-2.5">
+                <ShoppingBag size={16} strokeWidth={2} />
+                {t(c.quickView.outOfStock)}
+              </span>
+            ) : (
+              <AnimatePresence mode="wait" initial={false}>
               {added ? (
                 <motion.span
                   key="added"
@@ -204,6 +214,7 @@ export const ProductQuickViewModal = ({ product, onClose }) => {
                 </motion.span>
               )}
             </AnimatePresence>
+            )}
           </MagneticButton>
 
           <p className="flex items-center justify-center gap-2 text-[11px] text-taupe">

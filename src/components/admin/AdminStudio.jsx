@@ -977,6 +977,30 @@ const ProductsTab = ({ pushRef }) => {
                 <span className={`font-bold ${p.inStock !== false && p.quantity > 0 ? 'text-pearl/70' : 'text-terracotta'}`}>
                   {p.inStock !== false && p.quantity > 0 ? `${toFa(p.quantity)} عدد` : 'ناموجود'}
                 </span>
+                <span className="flex items-center gap-1">
+                  <button
+                    type="button"
+                    aria-label={`کاهش موجودی ${p.name}`}
+                    onClick={() => {
+                      const nq = Math.max(0, (Number(p.quantity) || 0) - 1);
+                      updateProduct(p.id, { quantity: nq, inStock: nq > 0 });
+                    }}
+                    className="flex h-6 w-6 items-center justify-center rounded-full border border-white/10 text-pearl/70 transition-all hover:border-terracotta/50 hover:text-terracotta active:scale-90"
+                  >
+                    −
+                  </button>
+                  <button
+                    type="button"
+                    aria-label={`افزایش موجودی ${p.name}`}
+                    onClick={() => {
+                      const nq = Math.min(99, (Number(p.quantity) || 0) + 1);
+                      updateProduct(p.id, { quantity: nq, inStock: nq > 0 });
+                    }}
+                    className="flex h-6 w-6 items-center justify-center rounded-full border border-white/10 text-pearl/70 transition-all hover:border-gold/40 hover:text-gold active:scale-90"
+                  >
+                    +
+                  </button>
+                </span>
                 <span className="text-taupe/60">{p.fabric}</span>
               </div>
             </div>

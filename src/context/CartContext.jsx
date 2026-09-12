@@ -10,32 +10,48 @@ export const CartProvider = ({ children }) => {
 
   const productIndex = useMemo(() => new Map(products.map((p) => [p.id, p])), [products]);
 
+  const stockOf = useCallback(
+    (id) => {
+      const p = productIndex.get(id);
+      if (!p || p.inStock === false || (p.quantity ?? 0) <= 0) return 0;
+      return p.quantity;
+    },
+    [productIndex],
+  );
+
   const addItem = useCallback(
     (id, qty = 1) => {
       setItems((prev) => {
+        const stock = stockOf(id);
+        if (stock === 0) return prev;
         const existing = prev.find((i) => i.id === id);
         if (existing) {
           return prev.map((i) =>
-            i.id === id ? { ...i, qty: Math.min(i.qty + qty, 99) } : i,
+            i.id === id ? { ...i, qty: Math.min(i.qty + qty, stock) } : i,
           );
         }
         const product = productIndex.get(id);
-        return [...prev, { id, qty, colorHex: product?.colors?.[0]?.hex }];
+        return [...prev, { id, qty: Math.min(qty, stock), colorHex: product?.colors?.[0]?.hex }];
       });
       setLastAdded({ id, at: Date.now() });
     },
-    [productIndex],
+    [productIndex, stockOf],
   );
 
   const removeItem = useCallback((id) => {
     setItems((prev) => prev.filter((i) => i.id !== id));
   }, []);
 
-  const increment = useCallback((id) => {
-    setItems((prev) =>
-      prev.map((i) => (i.id === id ? { ...i, qty: Math.min(i.qty + 1, 99) } : i)),
-    );
-  }, []);
+  const increment = useCallback(
+    (id) => {
+      const stock = stockOf(id);
+      if (stock === 0) return;
+      setItems((prev) =>
+        prev.map((i) => (i.id === id ? { ...i, qty: Math.min(i.qty + 1, stock) } : i)),
+      );
+    },
+    [stockOf],
+  );
 
   const decrement = useCallback((id) => {
     setItems((prev) =>

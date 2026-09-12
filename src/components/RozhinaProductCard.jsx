@@ -16,9 +16,11 @@ export const RozhinaProductCard = ({ product, onQuickView }) => {
   const { content } = useContent();
   const [added, setAdded] = useState(false);
   const inWishlist = isInWishlist(product.id);
+  const outOfStock = product.inStock === false || (product.quantity ?? 0) <= 0;
 
   const handleQuickAdd = (e) => {
     e.stopPropagation();
+    if (outOfStock) return;
     addItem(product.id);
     setAdded(true);
     window.setTimeout(() => setAdded(false), 1600);
@@ -107,9 +109,16 @@ export const RozhinaProductCard = ({ product, onQuickView }) => {
               type="button"
               aria-label={`افزودن ${product.name} به سبد خرید`}
               onClick={handleQuickAdd}
-              className="btn-gold-modern w-full !rounded-full !px-5 !py-3 !text-xs"
+              disabled={outOfStock}
+              className="btn-gold-modern w-full !rounded-full !px-5 !py-3 !text-xs disabled:cursor-not-allowed disabled:opacity-40"
             >
-              <AnimatePresence mode="wait" initial={false}>
+              {outOfStock ? (
+                <span className="flex w-full items-center justify-center gap-2">
+                  <ShoppingBag size={15} strokeWidth={2.2} />
+                  {t(content.card.outOfStock)}
+                </span>
+              ) : (
+                <AnimatePresence mode="wait" initial={false}>
                 {added ? (
                   <motion.span
                     key="added"
@@ -139,6 +148,7 @@ export const RozhinaProductCard = ({ product, onQuickView }) => {
                   </motion.span>
                 )}
               </AnimatePresence>
+              )}
             </button>
           </div>
         </div>
@@ -146,10 +156,16 @@ export const RozhinaProductCard = ({ product, onQuickView }) => {
         <div className="flex flex-1 flex-col p-5 pt-4">
           <div className="flex items-center justify-between gap-2">
             <h3 className="text-[15px] font-bold leading-6 text-pearl">{product.name}</h3>
-            {product.quantity <= 2 && (
-              <span className="whitespace-nowrap text-[10px] font-semibold text-terracotta">
-                {t(content.card.lowStock, { n: toFa(product.quantity) })}
+            {outOfStock ? (
+              <span className="whitespace-nowrap rounded-full bg-terracotta/10 px-2 py-0.5 text-[10px] font-bold text-terracotta">
+                {t(content.card.outOfStock)}
               </span>
+            ) : (
+              product.quantity <= 2 && (
+                <span className="whitespace-nowrap text-[10px] font-semibold text-terracotta">
+                  {t(content.card.lowStock, { n: toFa(product.quantity) })}
+                </span>
+              )
             )}
           </div>
 
