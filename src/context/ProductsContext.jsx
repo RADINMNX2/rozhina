@@ -1,8 +1,7 @@
 import { createContext, useContext, useCallback, useEffect, useMemo, useState } from 'react';
 import PRODUCTS from '../data/productsData';
 import { PLACEHOLDER_IMAGE } from '../data/productsData';
-
-const STORAGE_KEY = 'rozhina.products.v1';
+import { fetchRemoteJs, notifyRemoteAttempt } from '../utils/remote';
 
 const cloneQueue = (list) =>
   list.map((p) => ({
@@ -11,19 +10,6 @@ const cloneQueue = (list) =>
     badges: [...(p.badges ?? [])],
     images: [...(p.images ?? [])],
   }));
-
-const readInitial = () => {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-    }
-  } catch {
-    /* corrupt store -> fall back to code defaults */
-  }
-  return cloneQueue(PRODUCTS);
-};
 
 const clampQuantity = (q) => Math.max(0, Math.min(Number(q) || 0, 99));
 
@@ -59,15 +45,26 @@ export const normalizeProduct = (data, id) => {
 const ProductsContext = createContext(null);
 
 export const ProductsProvider = ({ children }) => {
-  const [products, setProducts] = useState(readInitial);
+  const [products, setProducts] = useState(() => cloneQueue(PRODUCTS));
 
   useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
-    } catch {
-      /* storage full / private mode */
-    }
-  }, [products]);
+    let alive = true;
+    fetchRemoteJs(
+      'src/data/productsData.js',
+      '({ PLACEHOLDER_IMAGE, FABRICS, COLORS, badgeStyle, PRODUCTS })',
+    )
+      .then((remote) => {
+        if (!alive) return;
+        if (Array.isArray(remote?.PRODUCTS) && remote.PRODUCTS.length > 0) {
+          setProducts(remote.PRODUCTS.map((p, i) => normalizeProduct(p, p.id ?? i + 1)));
+        }
+      })
+      .catch(() => {})
+      .finally(() => notifyRemoteAttempt());
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   const productIndex = useMemo(() => new Map(products.map((p) => [p.id, p])), [products]);
 

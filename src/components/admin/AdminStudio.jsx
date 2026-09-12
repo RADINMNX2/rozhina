@@ -25,11 +25,15 @@ import { useProducts } from '../../context/ProductsContext';
 import { useSettings } from '../../context/SettingsContext';
 import { useContent } from '../../context/ContentContext';
 import { formatPrice, toFa } from '../../utils/format';
+import { remoteReadyFlag, whenRemoteReady } from '../../utils/remote';
 
 const ADMIN_PIN = 'Rozhina8962';
-const GH_STORAGE_KEY = 'rozhina.admin.gh';
-const UNLOCK_KEY = 'rozhina.admin.unlocked';
-const LAST_SYNC_KEY = 'rozhina.admin.lastSync';
+
+let ghMetaStore = { owner: 'RADINMNX2', repo: 'rozhina', branch: 'main', pat: '' };
+const getGhMeta = () => ({ ...ghMetaStore });
+const setGhMeta = (patch) => {
+  ghMetaStore = { ...ghMetaStore, ...patch };
+};
 
 const GH_API = 'https://api.github.com';
 const GH_HEADERS = { Accept: 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28' };
@@ -194,21 +198,6 @@ async function ghPutFile(pat, owner, repo, path, content, message, branch) {
     return res.json();
   }
   throw new Error(`هم‌زمانی انتشار ${path}; لحظاتی بعد دوباره تلاش می‌شود`);
-}
-
-async function ghFetchFile(pat, owner, repo, path, branch) {
-  const url = `${GH_API}/repos/${owner}/${repo}/contents/${path}?ref=${branch}`;
-  const res = await fetch(url, { headers: { ...GH_HEADERS, Authorization: `Bearer ${pat}` } });
-  if (!res.ok) {
-    if (res.status === 404) return null;
-    throw new Error(`خطای ${res.status} در دریافت فایل ${path}`);
-  }
-  const json = await res.json();
-  if (!json.content) return null;
-  const bin = atob(json.content.replace(/\s/g, ''));
-  const bytes = new Uint8Array(bin.length);
-  for (let i = 0; i < bin.length; i += 1) bytes[i] = bin.charCodeAt(i);
-  return new TextDecoder().decode(bytes);
 }
 
 /* ---------------- tiny primitives ---------------- */
@@ -1516,35 +1505,19 @@ const ContentTab = ({ pushRef }) => {
 };
 
 /* ---------------- github tab ---------------- */
-const readGhMeta = () => {
-  try {
-    const raw = localStorage.getItem(GH_STORAGE_KEY);
-    return raw
-      ? { owner: 'RADINMNX2', repo: 'rozhina', branch: 'main', pat: '', ...JSON.parse(raw) }
-      : { owner: 'RADINMNX2', repo: 'rozhina', branch: 'main', pat: '' };
-  } catch {
-    return { owner: 'RADINMNX2', repo: 'rozhina', branch: 'main', pat: '' };
-  }
-};
-
 const GithubTab = ({ pushRef }) => {
   const { products } = useProducts();
   const { settings } = useSettings();
   const { content } = useContent();
-  const [meta, setMeta] = useState(readGhMeta);
+  const [meta, setMeta] = useState(getGhMeta);
   const [status, setStatus] = useState('idle');
   const [statusMsg, setStatusMsg] = useState('');
   const restoreRef = useRef(null);
 
-  useEffect(() => {
-    try {
-      localStorage.setItem(GH_STORAGE_KEY, JSON.stringify(meta));
-    } catch {
-      /* ignore */
-    }
-  }, [meta]);
-
-  const set = (key, val) => setMeta((m) => ({ ...m, [key]: val }));
+  const set = (key, val) => {
+    setGhMeta({ [key]: val });
+    setMeta((m) => ({ ...m, [key]: val }));
+  };
 
   const sync = async () => {
     if (!meta.pat.trim()) {
@@ -1571,10 +1544,6 @@ const GithubTab = ({ pushRef }) => {
       );
       setStatus('ok');
       setStatusMsg('منتشر شد! دیپلوی خودکار در حال اجراست…');
-      localStorage.setItem(
-        LAST_SYNC_KEY,
-        `${serializeProducts(products)}\n___\n${serializeConstants(settings)}\n___\n${serializeContent(content)}`,
-      );
       pushRef?.current?.('success', 'تغییرات در GitHub منتشر شد — سایت به‌زودی بروزرسانی می‌شود');
     } catch (err) {
       setStatus('error');
@@ -1648,7 +1617,8 @@ const GithubTab = ({ pushRef }) => {
           هر تغییری که در پنل ایجاد کنید (محصولات یا تنظیمات)، به‌صورت خودکار و پس از چند ثانیه به‌شکل
           کامیت روی فایل‌های <span dir="ltr">productsData.js</span> و <span dir="ltr">constants.js</span> منتشر می‌شود
           و GitHub Actions سایت را بروزرسانی می‌کند. دکمهٔ زیر برای انتشار فوری و همزمان هر دو فایل است.
-          توکن فقط در مرورگر خودتان (localStorage) ذخیره می‌شود.
+          توکن فقط در حافظهٔ همین صفحه نگه داشته می‌شود (هیچ‌چیز در localStorage ذخیره نمی‌شود) و با بستن
+          صفحه پاک می‌شود.
         </p>
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -1748,6 +1718,8 @@ const AutoPublisher = ({ pushRef }) => {
   const timer = useRef(null);
   const inflight = useRef(false);
   const sizeBlocked = useRef('');
+  const lastPushed = useRef('');
+  const baselineSet = useRef(false);
 
   const currentPayload = useCallback(
     () =>
@@ -1756,7 +1728,7 @@ const AutoPublisher = ({ pushRef }) => {
   );
 
   const publish = useCallback(async () => {
-    const meta = readGhMeta();
+    const meta = getGhMeta();
     if (!meta.pat.trim() || !meta.owner.trim() || !meta.repo.trim()) return;
     if (inflight.current) return;
     inflight.current = true;
@@ -1783,7 +1755,7 @@ const AutoPublisher = ({ pushRef }) => {
         serializeContent(content),
         'chore(content): auto-sync site texts from Rozhina Admin Studio', meta.branch,
       );
-      localStorage.setItem(LAST_SYNC_KEY, payload);
+      lastPushed.current = payload;
       pushRef?.current?.('success', 'تغییرات خودکار روی سرور منتشر شد — سایت در حال بروزرسانی است');
     } catch (err) {
       pushRef?.current?.('error', `انتشار خودکار ناموفق: ${String(err?.message || err).slice(0, 60)}`);
@@ -1792,51 +1764,35 @@ const AutoPublisher = ({ pushRef }) => {
     }
     const pending = currentPayload();
     if (
-      pending !== localStorage.getItem(LAST_SYNC_KEY) &&
+      pending !== lastPushed.current &&
       pending !== sizeBlocked.current &&
-      readGhMeta().pat.trim()
+      getGhMeta().pat.trim()
     ) {
       timer.current = window.setTimeout(publish, 1500);
     }
   }, [currentPayload, products, settings, content, pushRef]);
 
   useEffect(() => {
-    const meta = readGhMeta();
-    if (!meta.pat.trim() || !meta.owner.trim() || !meta.repo.trim()) return;
-    let cancelled = false;
-
-    const seedOrCheck = async () => {
-      if (cancelled || localStorage.getItem(LAST_SYNC_KEY)) return;
-      try {
-        const [serverProducts, serverConstants, serverContent] = await Promise.all([
-          ghFetchFile(meta.pat, meta.owner, meta.repo, 'src/data/productsData.js', meta.branch),
-          ghFetchFile(meta.pat, meta.owner, meta.repo, 'src/data/constants.js', meta.branch),
-          ghFetchFile(meta.pat, meta.owner, meta.repo, 'src/data/content.js', meta.branch),
-        ]);
-        if (cancelled) return;
-        const drifted =
-          (serverProducts !== null && serverProducts !== serializeProducts(products)) ||
-          (serverConstants !== null && serverConstants !== serializeConstants(settings)) ||
-          (serverContent !== null && serverContent !== serializeContent(content));
-        if (drifted) {
-          publish();
-          return;
-        }
-      } catch {
-        /* بدون توکن معتبر، فقط baseline محلی ذخیره می‌شود */
-      }
-      localStorage.setItem(LAST_SYNC_KEY, currentPayload());
-    };
-    seedOrCheck();
-
-    timer.current = window.setTimeout(() => {
-      const last = localStorage.getItem(LAST_SYNC_KEY);
-      if (last && currentPayload() !== last) publish();
-    }, 3000);
+    let alive = true;
+    whenRemoteReady().then(() => {
+      if (!alive || baselineSet.current) return;
+      baselineSet.current = true;
+      lastPushed.current = currentPayload();
+    });
     return () => {
-      cancelled = true;
-      window.clearTimeout(timer.current);
+      alive = false;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPayload]);
+
+  useEffect(() => {
+    const meta = getGhMeta();
+    if (!meta.pat.trim() || !meta.owner.trim() || !meta.repo.trim()) return;
+    if (!remoteReadyFlag()) return;
+    if (lastPushed.current && currentPayload() !== lastPushed.current) {
+      window.clearTimeout(timer.current);
+      timer.current = window.setTimeout(publish, 1500);
+    }
   }, [products, settings, content, currentPayload, publish]);
 
   return null;
@@ -1869,7 +1825,7 @@ export const AdminStudio = () => {
 
   const openAdmin = useCallback(() => {
     setOpen(true);
-    setUnlocked(sessionStorage.getItem(UNLOCK_KEY) === '1');
+    setUnlocked(false);
   }, []);
 
   const closeAdmin = useCallback(() => {
@@ -1906,7 +1862,6 @@ export const AdminStudio = () => {
   }, [openAdmin, importProducts, replaceSettings, replaceContent]);
 
   const unlock = useCallback(() => {
-    sessionStorage.setItem(UNLOCK_KEY, '1');
     setUnlocked(true);
     push('success', 'به پنل مدیریت خوش آمدید');
   }, [push]);

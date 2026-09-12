@@ -8,8 +8,7 @@ import {
   SUPPORT_ID,
   WHATSAPP_NUMBER,
 } from '../data/constants';
-
-const STORAGE_KEY = 'rozhina.settings.v1';
+import { fetchRemoteJs, notifyRemoteAttempt } from '../utils/remote';
 
 export const DEFAULT_SETTINGS = {
   announcementText: ANNOUNCEMENT_TEXT,
@@ -21,33 +20,29 @@ export const DEFAULT_SETTINGS = {
   supportId: SUPPORT_ID,
 };
 
-const readInitial = () => {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      if (parsed && typeof parsed === 'object') {
-        return { ...DEFAULT_SETTINGS, ...parsed };
-      }
-    }
-  } catch {
-    /* corrupt store -> defaults */
-  }
-  return { ...DEFAULT_SETTINGS };
-};
-
 const SettingsContext = createContext(null);
 
 export const SettingsProvider = ({ children }) => {
-  const [settings, setSettings] = useState(readInitial);
+  const [settings, setSettings] = useState(() => ({ ...DEFAULT_SETTINGS }));
 
   useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
-    } catch {
-      /* private mode */
-    }
-  }, [settings]);
+    let alive = true;
+    fetchRemoteJs(
+      'src/data/constants.js',
+      '({ whatsapp: WHATSAPP_NUMBER, instagramHandle: INSTAGRAM_HANDLE, instagramUrl: INSTAGRAM_URL, freeShippingThreshold: FREE_SHIPPING_THRESHOLD, announcementText: ANNOUNCEMENT_TEXT, phone: PHONE_NUMBER, supportId: SUPPORT_ID })',
+    )
+      .then((remote) => {
+        if (!alive) return;
+        if (remote && typeof remote === 'object') {
+          setSettings((prev) => ({ ...prev, ...remote }));
+        }
+      })
+      .catch(() => {})
+      .finally(() => notifyRemoteAttempt());
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   const updateSettings = useCallback((patch) => {
     setSettings((prev) => ({ ...prev, ...patch }));

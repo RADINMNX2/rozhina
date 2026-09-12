@@ -1,7 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { CONTENT } from '../data/content';
-
-const STORAGE_KEY = 'rozhina.content.v1';
+import { fetchRemoteJs, notifyRemoteAttempt } from '../utils/remote';
 
 const isPlainObject = (v) => v != null && typeof v === 'object' && !Array.isArray(v);
 
@@ -25,33 +24,26 @@ const backfillShots = (merged) => {
   return { ...merged, lookbook: { ...cur, shots } };
 };
 
-const readInitial = () => {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      if (parsed && typeof parsed === 'object') {
-        return backfillShots(deepMerge(CONTENT, parsed));
-      }
-    }
-  } catch {
-    /* corrupt store -> defaults */
-  }
-  return CONTENT;
-};
-
 const ContentContext = createContext(null);
 
 export const ContentProvider = ({ children }) => {
-  const [content, setContent] = useState(readInitial);
+  const [content, setContent] = useState(() => CONTENT);
 
   useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(content));
-    } catch {
-      /* private mode */
-    }
-  }, [content]);
+    let alive = true;
+    fetchRemoteJs('src/data/content.js', 'CONTENT')
+      .then((remote) => {
+        if (!alive) return;
+        if (remote && typeof remote === 'object') {
+          setContent(backfillShots(remote));
+        }
+      })
+      .catch(() => {})
+      .finally(() => notifyRemoteAttempt());
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   const updateContent = useCallback((patch) => {
     setContent((prev) => deepMerge(prev, patch));
