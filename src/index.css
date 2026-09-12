@@ -93,6 +93,48 @@
     @apply translate-x-[320%];
   }
 
+  .quickview-sheet {
+    max-height: 90vh;
+    max-height: 90dvh;
+  }
+
+  .btn-gold-modern {
+    @apply relative inline-flex items-center justify-center gap-2.5 overflow-hidden rounded-2xl bg-gradient-to-b from-gold to-bronze px-8 py-4 text-sm font-extrabold tracking-wide text-obsidian;
+    box-shadow:
+      0 0 0 1px rgba(226, 201, 151, 0.35),
+      0 14px 40px -14px rgba(226, 201, 151, 0.5),
+      inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    transition:
+      transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 0.35s ease;
+  }
+
+  .btn-gold-modern::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      115deg,
+      transparent 25%,
+      rgba(255, 255, 255, 0.45) 50%,
+      transparent 75%
+    );
+    transform: translateX(-140%) skewX(-18deg);
+    animation: gold-sweep 3.2s ease-in-out infinite;
+  }
+
+  .btn-gold-modern:hover {
+    transform: translateY(-2px);
+    box-shadow:
+      0 0 0 1.5px rgba(226, 201, 151, 0.55),
+      0 20px 60px -14px rgba(226, 201, 151, 0.7),
+      inset 0 1px 0 rgba(255, 255, 255, 0.55);
+  }
+
+  .btn-gold-modern:active {
+    transform: scale(0.97);
+  }
+
   .lux-input {
     @apply w-full border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-pearl outline-none backdrop-blur-xl transition-colors duration-300 placeholder:text-taupe/70 focus:border-gold/60;
   }
@@ -154,5 +196,16 @@
 
   .ambient-still {
     will-change: opacity, transform;
+  }
+}
+
+@keyframes gold-sweep {
+  0%,
+  55% {
+    transform: translateX(-140%) skewX(-18deg);
+  }
+  85%,
+  100% {
+    transform: translateX(160%) skewX(-18deg);
   }
 }
