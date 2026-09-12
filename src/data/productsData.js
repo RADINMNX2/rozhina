@@ -31,6 +31,7 @@ export const PRODUCTS = [
     id: 1,
     name: "123",
     enName: "213",
+    code: "",
     fabric: "21321",
     dimensions: "1231321",
     colors: [{ label: "کرم", hex: "#FFFFFF" }, { label: "کلاسیک", hex: "#E2C997" }],
