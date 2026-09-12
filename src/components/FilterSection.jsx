@@ -1,5 +1,7 @@
+import { useMemo } from 'react';
 import { Check, RotateCcw } from 'lucide-react';
-import { FABRICS, COLORS } from '../data/productsData';
+import { COLORS } from '../data/productsData';
+import { useProducts } from '../context/ProductsContext';
 import { toFa } from '../utils/format';
 
 const SORTS = [
@@ -8,10 +10,26 @@ const SORTS = [
   { value: 'price-desc', label: 'گران‌ترین' },
 ];
 
-export const FilterSection = ({ fabric, setFabric, color, setColor, sort, setSort, count }) => (
+export const FilterSection = ({ fabric, setFabric, color, setColor, sort, setSort, count }) => {
+  const { products } = useProducts();
+
+  const fabrics = useMemo(() => {
+    const seen = new Set();
+    const list = [];
+    for (const p of products) {
+      const f = p.fabric?.trim();
+      if (f && !seen.has(f)) {
+        seen.add(f);
+        list.push(f);
+      }
+    }
+    return list;
+  }, [products]);
+
+  return (
   <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
     <div className="no-scrollbar -mx-4 flex items-center gap-2 overflow-x-auto px-4 pb-1">
-      {['همه', ...FABRICS].map((f) => (
+      {['همه', ...fabrics].map((f) => (
         <button
           key={f}
           type="button"
@@ -83,5 +101,6 @@ export const FilterSection = ({ fabric, setFabric, color, setColor, sort, setSor
         </div>
       </div>
     </div>
-  </div>
-);
+</div>
+  );
+};

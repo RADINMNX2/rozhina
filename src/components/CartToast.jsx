@@ -2,13 +2,14 @@ import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Check, ShoppingBag } from 'lucide-react';
 import { useCart } from '../context/CartContext';
-import { PRODUCTS } from '../data/productsData';
+import { useProducts } from '../context/ProductsContext';
 import { formatPrice } from '../utils/format';
 
 const AUTO_DISMISS_MS = 3500;
 
 export const CartToast = ({ threshold = 480 }) => {
   const { lastAdded } = useCart();
+  const { getProduct } = useProducts();
   const [visible, setVisible] = useState(false);
   const [productId, setProductId] = useState(null);
 
@@ -26,7 +27,7 @@ export const CartToast = ({ threshold = 480 }) => {
     return () => window.clearTimeout(t);
   }, [lastAdded, threshold]);
 
-  const product = productId ? PRODUCTS.find((p) => p.id === productId) : null;
+  const product = productId ? getProduct(productId) : null;
 
   return (
     <AnimatePresence>

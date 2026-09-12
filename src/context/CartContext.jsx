@@ -1,25 +1,31 @@
 import { createContext, useContext, useMemo, useState, useCallback } from 'react';
-import { PRODUCTS } from '../data/productsData';
+import { useProducts } from './ProductsContext';
 
 const CartContext = createContext(null);
 
 export const CartProvider = ({ children }) => {
+  const { products } = useProducts();
   const [items, setItems] = useState([]);
   const [lastAdded, setLastAdded] = useState(null);
 
-  const addItem = useCallback((id, qty = 1) => {
-    setItems((prev) => {
-      const existing = prev.find((i) => i.id === id);
-      if (existing) {
-        return prev.map((i) =>
-          i.id === id ? { ...i, qty: Math.min(i.qty + qty, 99) } : i,
-        );
-      }
-      const product = PRODUCTS.find((p) => p.id === id);
-      return [...prev, { id, qty, colorHex: product?.colors?.[0]?.hex }];
-    });
-    setLastAdded({ id, at: Date.now() });
-  }, []);
+  const productIndex = useMemo(() => new Map(products.map((p) => [p.id, p])), [products]);
+
+  const addItem = useCallback(
+    (id, qty = 1) => {
+      setItems((prev) => {
+        const existing = prev.find((i) => i.id === id);
+        if (existing) {
+          return prev.map((i) =>
+            i.id === id ? { ...i, qty: Math.min(i.qty + qty, 99) } : i,
+          );
+        }
+        const product = productIndex.get(id);
+        return [...prev, { id, qty, colorHex: product?.colors?.[0]?.hex }];
+      });
+      setLastAdded({ id, at: Date.now() });
+    },
+    [productIndex],
+  );
 
   const removeItem = useCallback((id) => {
     setItems((prev) => prev.filter((i) => i.id !== id));
@@ -46,9 +52,9 @@ export const CartProvider = ({ children }) => {
   const detail = useMemo(
     () =>
       items
-        .map((i) => ({ ...i, product: PRODUCTS.find((p) => p.id === i.id) }))
+        .map((i) => ({ ...i, product: productIndex.get(i.id) }))
         .filter((i) => Boolean(i.product)),
-    [items],
+    [items, productIndex],
   );
 
   const totalItems = useMemo(() => detail.reduce((sum, i) => sum + i.qty, 0), [detail]);

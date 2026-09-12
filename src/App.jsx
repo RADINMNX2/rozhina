@@ -12,12 +12,14 @@ import { SearchOverlay } from './components/SearchOverlay';
 import { FloatingWhatsApp } from './components/FloatingWhatsApp';
 import { ProductQuickViewModal } from './components/ProductQuickViewModal';
 import { CartToast } from './components/CartToast';
-import { PRODUCTS } from './data/productsData';
+import { AdminStudio } from './components/admin/AdminStudio';
+import { useProducts } from './context/ProductsContext';
 
 const getSearchKey = (product) =>
   `${product.name} ${product.enName} ${product.fabric}`.toLowerCase();
 
 export default function App() {
+  const { products: allProducts } = useProducts();
   const [cartOpen, setCartOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [fabric, setFabric] = useState('همه');
@@ -27,7 +29,7 @@ export default function App() {
   const [quickView, setQuickView] = useState(null);
 
   const products = useMemo(() => {
-    let list = [...PRODUCTS];
+    let list = [...allProducts];
 
     if (fabric !== 'همه') list = list.filter((p) => p.fabric === fabric);
     if (color) list = list.filter((p) => p.colors.some((c) => c.hex === color));
@@ -46,7 +48,7 @@ export default function App() {
         list.sort((a, b) => Number(Boolean(b.badges.length)) - Number(Boolean(a.badges.length)));
     }
     return list;
-  }, [fabric, color, sort, search]);
+  }, [allProducts, fabric, color, sort, search]);
 
   const handleSearchSelect = (product) => {
     setSearch(product.name);
@@ -88,6 +90,7 @@ export default function App() {
       <FloatingWhatsApp />
       <ProductQuickViewModal product={quickView} onClose={() => setQuickView(null)} />
       <CartToast />
+      <AdminStudio />
     </div>
   );
 }

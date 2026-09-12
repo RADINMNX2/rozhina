@@ -1,6 +1,6 @@
-import { Instagram, MapPin, Phone } from 'lucide-react';
+import { Instagram, Lock, MapPin, Phone } from 'lucide-react';
 import { Logo } from './Logo';
-import { INSTAGRAM_HANDLE, INSTAGRAM_URL } from '../data/constants';
+import { useSettings } from '../context/SettingsContext';
 
 const QUICK_LINKS = [
   { label: 'کالکشن جدید', href: '#collection' },
@@ -12,7 +12,11 @@ const QUICK_LINKS = [
 
 const HELP_LINKS = ['راهنمای انتخاب سایز', 'روش‌های ارسال', 'سیاست بازگشت کالا', 'همکاری با ما'];
 
-export const Footer = () => (
+const openAdmin = () => window.dispatchEvent(new Event('rozhina:open-admin'));
+
+export const Footer = () => {
+  const { settings } = useSettings();
+  return (
   <footer className="border-t border-white/[0.05] bg-[#0A0909] text-pearl">
     <div className="container-lux grid gap-12 py-16 md:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1.2fr]">
       <div>
@@ -22,13 +26,13 @@ export const Footer = () => (
           وارداتی. ظرافت را به استایل خود بیاورید.
         </p>
         <a
-          href={INSTAGRAM_URL}
+          href={settings.instagramUrl}
           target="_blank"
           rel="noreferrer"
           className="mt-6 inline-flex items-center gap-2.5 rounded-full border border-gold/25 bg-gold/[0.06] px-5 py-2.5 text-xs font-semibold text-gold backdrop-blur-xl transition-all duration-300 hover:bg-gold hover:text-obsidian hover:shadow-gold-cta active:scale-[0.98]"
         >
           <Instagram size={15} strokeWidth={1.6} />
-          {INSTAGRAM_HANDLE}
+          {settings.instagramHandle}
         </a>
       </div>
 
@@ -77,13 +81,19 @@ export const Footer = () => (
             <span className="flex h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-white/[0.03]">
               <Phone size={13} strokeWidth={1.6} className="text-gold" />
             </span>
-            <span dir="ltr">۰۹۱۲ ۳۴۵ ۶۷۸۹</span>
+            <span dir="ltr">{settings.phone}</span>
           </li>
           <li className="flex items-center gap-3">
             <span className="flex h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-white/[0.03]">
               <Instagram size={13} strokeWidth={1.6} className="text-gold" />
             </span>
-            <span>{INSTAGRAM_HANDLE}</span>
+            <span>{settings.instagramHandle}</span>
+          </li>
+          <li className="flex items-center gap-3">
+            <span className="flex h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-white/[0.03]">
+              <Lock size={13} strokeWidth={1.6} className="text-gold" />
+            </span>
+            <span>پشتیبانی: {settings.supportId}</span>
           </li>
           <li className="flex items-center gap-3">
             <span className="flex h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-white/[0.03]">
@@ -98,12 +108,24 @@ export const Footer = () => (
     <div className="border-t border-white/[0.06]">
       <div className="container-lux flex flex-col items-center justify-between gap-3 py-6 text-center text-xs text-pearl/40 md:flex-row">
         <p>© ۱۴۰۵ گالری شال و روسری روژینا — تمامی حقوق محفوظ است.</p>
-        <p className="flex items-center gap-2">
-          <span className="h-1 w-1 rounded-full bg-gold shadow-[0_0_6px_rgba(226,201,151,0.7)]" />
-          طراحی با ظرافت برای عاشقان استایل
-          <span className="h-1 w-1 rounded-full bg-gold shadow-[0_0_6px_rgba(226,201,151,0.7)]" />
-        </p>
+        <div className="flex items-center gap-4">
+          <p className="flex items-center gap-2">
+            <span className="h-1 w-1 rounded-full bg-gold shadow-[0_0_6px_rgba(226,201,151,0.7)]" />
+            طراحی با ظرافت برای عاشقان استایل
+            <span className="h-1 w-1 rounded-full bg-gold shadow-[0_0_6px_rgba(226,201,151,0.7)]" />
+          </p>
+          <button
+            type="button"
+            onClick={openAdmin}
+            aria-label="پنل مدیریت فروشگاه"
+            title="مدیریت"
+            className="flex h-7 w-7 items-center justify-center rounded-full text-pearl/25 transition-all duration-300 hover:bg-gold/10 hover:text-gold active:scale-90"
+          >
+            <Lock size={12} strokeWidth={1.6} />
+          </button>
+        </div>
       </div>
     </div>
   </footer>
-);
+  );
+};

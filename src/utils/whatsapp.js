@@ -1,4 +1,3 @@
-import { WHATSAPP_NUMBER } from '../data/constants';
 import { formatPrice, toFa } from './format';
 
 export const buildOrderMessage = (items) => {
@@ -11,5 +10,5 @@ export const buildOrderMessage = (items) => {
   ].join('\n');
 };
 
-export const buildWhatsAppLink = (message) =>
-  `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+export const buildWhatsAppLink = (message, number) =>
+  `https://wa.me/${String(number).replace(/\D/g, '')}?text=${encodeURIComponent(message)}`;

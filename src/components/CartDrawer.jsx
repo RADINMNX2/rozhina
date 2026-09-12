@@ -2,8 +2,8 @@ import { useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Minus, Plus, ShoppingBag, Trash2, X } from 'lucide-react';
 import { useCart } from '../context/CartContext';
+import { useSettings } from '../context/SettingsContext';
 import { formatPrice, toFa } from '../utils/format';
-import { FREE_SHIPPING_THRESHOLD } from '../data/constants';
 import { buildOrderMessage, buildWhatsAppLink } from '../utils/whatsapp';
 import { MagneticButton } from './MagneticButton';
 import { withImageFallback } from '../utils/imageFallback';
@@ -12,6 +12,9 @@ const DRAWER_SPRING = { type: 'spring', damping: 32, stiffness: 280, mass: 0.85 
 
 export const CartDrawer = ({ open, onClose }) => {
   const { items, totalItems, subtotal, increment, decrement, removeItem, setColor } = useCart();
+  const { settings } = useSettings();
+
+  const threshold = Math.max(Number(settings.freeShippingThreshold) || 0, 0);
 
   useEffect(() => {
     document.body.style.overflow = open ? 'hidden' : '';
@@ -26,10 +29,14 @@ export const CartDrawer = ({ open, onClose }) => {
     return () => window.removeEventListener('keydown', onKey);
   }, [open, onClose]);
 
-  const remaining = Math.max(FREE_SHIPPING_THRESHOLD - subtotal, 0);
-  const progress = Math.min((subtotal / FREE_SHIPPING_THRESHOLD) * 100, 100);
+  const remaining = Math.max(threshold - subtotal, 0);
+  const progress = threshold > 0 ? Math.min((subtotal / threshold) * 100, 100) : 100;
   const handleCheckout = () => {
-    window.open(buildWhatsAppLink(buildOrderMessage(items)), '_blank', 'noopener,noreferrer');
+    window.open(
+      buildWhatsAppLink(buildOrderMessage(items), settings.whatsapp),
+      '_blank',
+      'noopener,noreferrer',
+    );
   };
 
   return (

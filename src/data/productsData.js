@@ -1,5 +1,7 @@
 const photo = (id) => `https://images.unsplash.com/${id}?auto=format&fit=crop&w=900&q=80`;
 
+export const PLACEHOLDER_IMAGE = photo('photo-1520006403909-838d6b92c22e');
+
 export const FABRICS = ['ابریشم ژاکارد', 'نخ لنین', 'نخ ابریشم', 'کشمیر و موهر', 'کرپ حریر'];
 
 export const COLORS = [

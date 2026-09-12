@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Search, X } from 'lucide-react';
-import PRODUCTS from '../data/productsData';
+import { useProducts } from '../context/ProductsContext';
 import { formatPrice, toFa } from '../utils/format';
 import { withImageFallback } from '../utils/imageFallback';
 
 export const SearchOverlay = ({ open, onClose, onSelect }) => {
+  const { products } = useProducts();
   const [query, setQuery] = useState('');
   const inputRef = useRef(null);
 
@@ -28,10 +29,10 @@ export const SearchOverlay = ({ open, onClose, onSelect }) => {
   const results = useMemo(() => {
     const q = query.trim();
     if (!q) return [];
-    return PRODUCTS.filter(
+    return products.filter(
       (p) => p.name.includes(q) || p.enName.toLowerCase().includes(q.toLowerCase()) || p.fabric.includes(q),
     );
-  }, [query]);
+  }, [query, products]);
 
   return (
     <div
@@ -112,7 +113,7 @@ export const SearchOverlay = ({ open, onClose, onSelect }) => {
         </div>
 
         <p className="mt-auto pt-6 text-center text-[11px] text-taupe">
-          {toFa(PRODUCTS.length)} محصول در کالکشن روژینا
+          {toFa(products.length)} محصول در کالکشن روژینا
         </p>
       </div>
     </div>
