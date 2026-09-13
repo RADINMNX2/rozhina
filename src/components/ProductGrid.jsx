@@ -27,7 +27,7 @@ export const ProductGrid = ({ products, onQuickView }) => {
   }
 
   return (
-    <Stagger className="grid grid-cols-2 gap-x-5 gap-y-10 md:gap-x-7 lg:grid-cols-3 md:gap-y-14">
+    <Stagger className="grid grid-cols-2 gap-x-4 gap-y-9 sm:gap-x-5 md:gap-y-12 lg:grid-cols-3 lg:gap-x-7 xl:grid-cols-4">
       {products.map((product) => (
         <StaggerItem key={product.id}>
           <RozhinaProductCard product={product} onQuickView={handleQuickView} />

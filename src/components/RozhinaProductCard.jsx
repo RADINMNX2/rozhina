@@ -40,7 +40,7 @@ export const RozhinaProductCard = memo(function RozhinaProductCard({ product, on
         transition={{ type: 'spring', stiffness: 300, damping: 22 }}
         className="card-lux group relative flex h-full cursor-pointer flex-col transition-[border-color,box-shadow] duration-500 hover:border-gold/25 hover:shadow-gold-glow"
       >
-        <div className="relative aspect-[3/4] overflow-hidden rounded-t-2xl bg-white/[0.02] group-hover:will-change-transform">
+        <div className="relative aspect-[4/5] overflow-hidden rounded-t-2xl bg-white/[0.02] sm:aspect-[3/4] group-hover:will-change-transform">
           <div className="sheen absolute inset-0 z-[1]">
             <img
               src={product.images[0]}
@@ -65,7 +65,7 @@ export const RozhinaProductCard = memo(function RozhinaProductCard({ product, on
               {product.badges.map((badge) => (
                 <span
                   key={badge}
-                  className={`px-2.5 py-1 text-[10px] font-bold tracking-wide backdrop-blur-sm ${badgeStyle(badge)}`}
+                  className={`px-2.5 py-1 text-[10px] font-bold tracking-wide ${badgeStyle(badge)}`}
                 >
                   {badge}
                 </span>
@@ -78,7 +78,7 @@ export const RozhinaProductCard = memo(function RozhinaProductCard({ product, on
             aria-label={inWishlist ? 'حذف از علاقه‌مندی‌ها' : 'افزودن به علاقه‌مندی‌ها'}
             aria-pressed={inWishlist}
             onClick={handleWishlist}
-            className="focus-ring absolute left-3 top-3 flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-obsidian/70 text-pearl/80 backdrop-blur-md transition-[transform,color,background-color,border-color] duration-300 hover:scale-110 active:scale-95"
+            className="focus-ring absolute left-3 top-3 flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-obsidian/85 text-pearl/80 transition-[transform,color,background-color,border-color] duration-300 hover:scale-110 active:scale-95"
           >
             <Heart
               size={16}
@@ -98,7 +98,7 @@ export const RozhinaProductCard = memo(function RozhinaProductCard({ product, on
               e.stopPropagation();
               onQuickView?.(product);
             }}
-            className="focus-ring absolute left-3 top-[3.25rem] flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-obsidian/70 text-pearl/80 opacity-0 backdrop-blur-md transition-[transform,color,border-color,opacity] duration-300 hover:scale-110 hover:border-gold/40 hover:text-gold active:scale-95 group-hover:opacity-100 max-sm:opacity-100"
+            className="focus-ring absolute left-3 top-[3.25rem] flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-obsidian/85 text-pearl/80 opacity-0 transition-[transform,color,border-color,opacity] duration-300 hover:scale-110 hover:border-gold/40 hover:text-gold active:scale-95 group-hover:opacity-100 max-sm:opacity-100"
           >
             <Eye size={16} strokeWidth={1.8} />
           </button>
@@ -153,9 +153,9 @@ export const RozhinaProductCard = memo(function RozhinaProductCard({ product, on
           </div>
         </div>
 
-        <div className="flex flex-1 flex-col p-5 pt-4">
+        <div className="flex flex-1 flex-col p-3.5 pt-3.5 sm:p-5 sm:pt-4">
           <div className="flex items-center justify-between gap-2">
-            <h3 className="text-[15px] font-bold leading-6 text-pearl">{product.name}</h3>
+            <h3 className="text-[13px] font-bold leading-5 text-pearl sm:text-[15px] sm:leading-6">{product.name}</h3>
             {outOfStock ? (
               <span className="whitespace-nowrap rounded-full bg-terracotta/10 px-2 py-0.5 text-[10px] font-bold text-terracotta">
                 {t(content.card.outOfStock)}
@@ -169,7 +169,7 @@ export const RozhinaProductCard = memo(function RozhinaProductCard({ product, on
             )}
           </div>
 
-          <p className="mt-0.5 flex items-center gap-2 text-[11px] font-serif tracking-wide text-taupe" dir="ltr">
+          <p className="mt-0.5 hidden items-center gap-2 text-[11px] font-serif tracking-wide text-taupe sm:flex" dir="ltr">
             <span className="truncate">{product.enName}</span>
             {product.code && (
               <span className="shrink-0 rounded-md border border-white/[0.08] bg-white/[0.03] px-1.5 py-0.5 font-mono text-[9px] font-bold text-pearl/45">
@@ -193,7 +193,7 @@ export const RozhinaProductCard = memo(function RozhinaProductCard({ product, on
           </div>
 
           <div className="mt-3 flex items-baseline gap-2">
-            <span className="text-base font-extrabold tracking-tight text-pearl">
+            <span className="text-[15px] font-extrabold tracking-tight text-pearl sm:text-base">
               {formatPrice(product.price)}
             </span>
             <span className="text-[11px] text-taupe">تومان</span>
