@@ -21,7 +21,7 @@ export const Newsletter = () => {
     >
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(226,201,151,0.05),transparent_62%)]" />
       <div className="container-lux relative flex flex-col items-center justify-between gap-8 lg:flex-row lg:gap-14">
-        <Reveal className="max-w-xl text-center lg:text-right">
+        <Reveal className="max-w-xl text-center lg:text-start">
           <span className="eyebrow inline-flex items-center gap-3">
             <span className="h-px w-8 bg-gold shadow-[0_0_8px_rgba(226,201,151,0.5)]" />
             NEWSLETTER
@@ -53,9 +53,9 @@ export const Newsletter = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Email address"
-                  className="lux-input flex-1 !text-left"
+                  className="lux-input min-h-12 flex-1 !text-left !text-base"
                 />
-                <button type="submit" className="btn-gold btn-shimmer !px-6">
+                <button type="submit" className="btn-gold btn-shimmer min-h-12 w-full !px-6 sm:w-auto">
                   {c.button}
                 </button>
               </div>
