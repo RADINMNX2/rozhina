@@ -12,4 +12,4 @@ export const PHONE_NUMBER = "09363204121";
 
 export const SUPPORT_ID = "@diakodfrr";
 
-export const PAYMENT_URL = "https://plain-lab-c081.radinmnx-cod.workers.dev";
+export const PAYMENT_URL = "https://rozhina-pay.radinmnx-cod.workers.dev";
