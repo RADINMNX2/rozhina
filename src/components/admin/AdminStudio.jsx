@@ -1844,7 +1844,7 @@ export const AdminStudio = () => {
   const { importProducts } = useProducts();
   const { replaceSettings } = useSettings();
   const { replaceContent } = useContent();
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(() => window.location.hash === '#/admin' || window.location.hash === '#admin');
   const [unlocked, setUnlocked] = useState(false);
   const [tab, setTab] = useState('products');
   const [toasts, setToasts] = useState([]);
@@ -1864,8 +1864,9 @@ export const AdminStudio = () => {
 
   const closeAdmin = useCallback(() => {
     setOpen(false);
-    if (window.location.hash === '#admin') {
+    if (window.location.hash === '#/admin' || window.location.hash === '#admin') {
       history.replaceState(null, '', window.location.pathname + window.location.search);
+      window.dispatchEvent(new HashChangeEvent('hashchange'));
     }
   }, []);
 

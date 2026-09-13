@@ -3,7 +3,9 @@ import { Logo } from './Logo';
 import { useSettings } from '../context/SettingsContext';
 import { useContent } from '../context/ContentContext';
 
-const openAdmin = () => window.dispatchEvent(new Event('rozhina:open-admin'));
+const openAdmin = () => {
+  window.location.hash = '#/admin';
+};
 
 export const Footer = () => {
   const { settings } = useSettings();

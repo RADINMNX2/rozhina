@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { AnnouncementBar } from './components/AnnouncementBar';
 import { Header } from './components/Header';
 import { Hero } from './components/Hero';
@@ -18,8 +18,11 @@ import { useProducts } from './context/ProductsContext';
 const getSearchKey = (product) =>
   `${product.name} ${product.enName} ${product.fabric}`.toLowerCase();
 
+const getRoute = () => (window.location.hash === '#/admin' || window.location.hash === '#admin' ? 'admin' : 'home');
+
 export default function App() {
   const { products: allProducts } = useProducts();
+  const [route, setRoute] = useState(getRoute);
   const [cartOpen, setCartOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [fabric, setFabric] = useState('همه');
@@ -27,6 +30,17 @@ export default function App() {
   const [sort, setSort] = useState('featured');
   const [search, setSearch] = useState('');
   const [quickView, setQuickView] = useState(null);
+
+  useEffect(() => {
+    const onHash = () => {
+      setRoute(getRoute());
+      if (getRoute() === 'admin') setQuickView(null);
+    };
+    window.addEventListener('hashchange', onHash);
+    return () => window.removeEventListener('hashchange', onHash);
+  }, []);
+
+  if (route === 'admin') return <AdminStudio />;
 
   const products = useMemo(() => {
     let list = [...allProducts];
@@ -90,7 +104,6 @@ export default function App() {
       <FloatingWhatsApp />
       <ProductQuickViewModal product={quickView} onClose={() => setQuickView(null)} />
       <CartToast />
-      <AdminStudio />
     </div>
   );
 }
