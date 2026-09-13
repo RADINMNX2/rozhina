@@ -11,8 +11,22 @@ import { MagneticButton } from './MagneticButton';
 import { withImageFallback } from '../utils/imageFallback';
 import { useFocusTrap } from '../hooks/useFocusTrap';
 import { useScrollLock } from '../hooks/useScrollLock';
+import { useReducedMotion } from '../hooks/useReducedMotion';
 
-const DRAWER_SPRING = { type: 'spring', damping: 32, stiffness: 280, mass: 0.85 };
+const PANEL_SPRING = { type: 'spring', damping: 30, stiffness: 300, mass: 0.9 };
+
+const useIsMobile = () => {
+  const [mobile, setMobile] = useState(() =>
+    typeof window !== 'undefined' ? window.matchMedia('(max-width: 767px)').matches : false,
+  );
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 767px)');
+    const on = (e) => setMobile(e.matches);
+    mq.addEventListener('change', on);
+    return () => mq.removeEventListener('change', on);
+  }, []);
+  return mobile;
+};
 
 export const CartDrawer = ({ open, onClose }) => {
   const { items, totalItems, subtotal, increment, decrement, removeItem, setColor } = useCart();
@@ -21,6 +35,8 @@ export const CartDrawer = ({ open, onClose }) => {
   const dialogRef = useRef(null);
   const [paying, setPaying] = useState(false);
   const [payError, setPayError] = useState('');
+  const reduced = useReducedMotion();
+  const isMobile = useIsMobile();
 
   const threshold = Math.max(Number(settings.freeShippingThreshold) || 0, 0);
   const paymentBase = String(settings.paymentUrl || '').replace(/\/+$/, '');
@@ -73,31 +89,42 @@ export const CartDrawer = ({ open, onClose }) => {
       {open && (
         <motion.div
           ref={dialogRef}
-          className="fixed inset-0 z-[60]"
+          className="fixed inset-0 z-[60] flex items-end justify-center md:items-center md:p-6"
           role="dialog"
           aria-label={content.cart.title}
           aria-modal="true"
         >
           <motion.div
-            className="absolute inset-0 bg-obsidian/70"
+            className="absolute inset-0 bg-obsidian/75"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.4 }}
+            transition={{ duration: 0.35 }}
             onClick={onClose}
           />
 
-          <motion.aside
-            className="absolute inset-inline-start-0 top-0 flex h-full w-full max-w-md flex-col border-s border-white/[0.06] bg-[#121110] shadow-nav-float"
-            initial={{ x: '-100%' }}
-            animate={{ x: 0 }}
-            exit={{ x: '-100%' }}
-            transition={DRAWER_SPRING}
+          <motion.div
+            className="relative flex max-h-[92dvh] w-full flex-col overflow-hidden rounded-t-[28px] bg-[#131211] shadow-[0_30px_90px_-24px_rgba(0,0,0,0.95)] ring-1 ring-white/[0.08] sm:max-w-lg md:max-h-[86vh] md:rounded-[28px]"
+            initial={reduced ? { opacity: 0 } : isMobile ? { y: '100%' } : { opacity: 0, scale: 0.95, y: 18 }}
+            animate={reduced ? { opacity: 1 } : isMobile ? { y: 0 } : { opacity: 1, scale: 1, y: 0 }}
+            exit={reduced ? { opacity: 0 } : isMobile ? { y: '100%' } : { opacity: 0, scale: 0.95, y: 18 }}
+            transition={reduced ? { duration: 0.18 } : PANEL_SPRING}
           >
+            <span
+              aria-hidden
+              className="pointer-events-none absolute inset-x-0 top-0 z-10 h-px bg-gradient-to-r from-transparent via-gold/70 to-transparent"
+            />
+            <span
+              aria-hidden
+              className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(226,201,151,0.07),transparent_55%)]"
+            />
+
             {/* Head */}
             <div className="flex items-center justify-between border-b border-white/[0.06] px-6 py-5">
               <div className="flex items-center gap-3">
-                <ShoppingBag size={18} strokeWidth={1.5} className="text-gold" />
+                <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-b from-gold to-bronze text-obsidian shadow-gold-glow">
+                  <ShoppingBag size={17} strokeWidth={1.8} />
+                </span>
                 <h2 className="text-base font-bold text-pearl">
                   {t(content.cart.title)} <span className="text-taupe">({toFa(totalItems)})</span>
                 </h2>
@@ -106,7 +133,7 @@ export const CartDrawer = ({ open, onClose }) => {
                 type="button"
                 aria-label="بستن سبد"
                 onClick={onClose}
-                className="flex h-9 w-9 items-center justify-center rounded-full text-pearl/70 transition-colors hover:bg-white/5 hover:text-pearl active:scale-95 focus-ring"
+                className="flex h-9 w-9 items-center justify-center rounded-full text-pearl/70 transition-[transform,background-color,color] duration-300 hover:rotate-90 hover:bg-white/5 hover:text-pearl active:scale-90 focus-ring"
               >
                 <X size={18} strokeWidth={1.5} />
               </button>
@@ -176,7 +203,7 @@ export const CartDrawer = ({ open, onClose }) => {
                                     onClick={() => setColor(product.id, c.hex)}
                                     className={`h-4 w-4 rounded-full transition-[transform,box-shadow] duration-300 ${
                                       colorHex === c.hex
-                                        ? 'ring-2 ring-gold ring-offset-1 ring-offset-[#121110] shadow-dot-glow'
+                                        ? 'ring-2 ring-gold ring-offset-1 ring-offset-[#131211] shadow-dot-glow'
                                         : 'ring-1 ring-inset ring-white/15 hover:scale-110'
                                     }`}
                                     style={{ backgroundColor: c.hex }}
@@ -280,7 +307,7 @@ export const CartDrawer = ({ open, onClose }) => {
                 </div>
               </div>
             )}
-          </motion.aside>
+          </motion.div>
         </motion.div>
       )}
     </AnimatePresence>
