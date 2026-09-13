@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { memo, useState } from 'react';
 import { Check, Eye, Heart, ShoppingBag } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { badgeStyle } from '../data/productsData';
@@ -10,7 +10,7 @@ import { useContent } from '../context/ContentContext';
 import { t } from '../utils/text';
 import { SpotlightCard } from './SpotlightCard';
 
-export const RozhinaProductCard = ({ product, onQuickView }) => {
+export const RozhinaProductCard = memo(function RozhinaProductCard({ product, onQuickView }) {
   const { addItem } = useCart();
   const { toggle, isInWishlist } = useWishlist();
   const { content } = useContent();
@@ -38,22 +38,22 @@ export const RozhinaProductCard = ({ product, onQuickView }) => {
         whileHover={{ y: -4 }}
         whileTap={{ scale: 0.985 }}
         transition={{ type: 'spring', stiffness: 300, damping: 22 }}
-        className="card-lux group relative flex h-full cursor-pointer flex-col transition-all duration-500 hover:border-gold/25 hover:shadow-gold-glow"
+        className="card-lux group relative flex h-full cursor-pointer flex-col transition-[border-color,box-shadow] duration-500 hover:border-gold/25 hover:shadow-gold-glow"
       >
-        <div className="relative aspect-[3/4] overflow-hidden rounded-t-2xl bg-white/[0.02] will-change-transform">
+        <div className="relative aspect-[3/4] overflow-hidden rounded-t-2xl bg-white/[0.02] group-hover:will-change-transform">
           <div className="sheen absolute inset-0 z-[1]">
             <img
               src={product.images[0]}
               alt={product.name}
               loading="lazy"
-              className="absolute inset-0 h-full w-full object-cover transition-all duration-700 ease-out group-hover:scale-[1.03] group-hover:opacity-0"
+              className="absolute inset-0 h-full w-full object-cover transition-[transform,opacity] duration-700 ease-out group-hover:scale-[1.03] group-hover:opacity-0"
               onError={withImageFallback}
             />
             <img
               src={product.images[1]}
               alt={`استایل ${product.name}`}
               loading="lazy"
-              className="absolute inset-0 h-full w-full scale-[1.03] object-cover opacity-0 transition-all duration-700 ease-out group-hover:scale-100 group-hover:opacity-100"
+              className="absolute inset-0 h-full w-full scale-[1.03] object-cover opacity-0 transition-[transform,opacity] duration-700 ease-out group-hover:scale-100 group-hover:opacity-100"
               onError={withImageFallback}
             />
           </div>
@@ -78,12 +78,12 @@ export const RozhinaProductCard = ({ product, onQuickView }) => {
             aria-label={inWishlist ? 'حذف از علاقه‌مندی‌ها' : 'افزودن به علاقه‌مندی‌ها'}
             aria-pressed={inWishlist}
             onClick={handleWishlist}
-            className="absolute left-3 top-3 flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-obsidian/70 text-pearl/80 backdrop-blur-md transition-all duration-300 hover:scale-110 active:scale-95"
+            className="focus-ring absolute left-3 top-3 flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-obsidian/70 text-pearl/80 backdrop-blur-md transition-[transform,color,background-color,border-color] duration-300 hover:scale-110 active:scale-95"
           >
             <Heart
               size={16}
               strokeWidth={1.8}
-              className={`transition-all duration-300 ${
+              className={`transition-colors duration-300 ${
                 inWishlist
                   ? 'fill-gold stroke-gold drop-shadow-[0_0_8px_rgba(226,201,151,0.55)]'
                   : 'text-pearl/80'
@@ -98,19 +98,19 @@ export const RozhinaProductCard = ({ product, onQuickView }) => {
               e.stopPropagation();
               onQuickView?.(product);
             }}
-            className="absolute left-3 top-[3.25rem] flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-obsidian/70 text-pearl/80 opacity-0 backdrop-blur-md transition-all duration-300 hover:scale-110 hover:border-gold/40 hover:text-gold active:scale-95 group-hover:opacity-100 max-sm:opacity-100"
+            className="focus-ring absolute left-3 top-[3.25rem] flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-obsidian/70 text-pearl/80 opacity-0 backdrop-blur-md transition-[transform,color,border-color,opacity] duration-300 hover:scale-110 hover:border-gold/40 hover:text-gold active:scale-95 group-hover:opacity-100 max-sm:opacity-100"
           >
             <Eye size={16} strokeWidth={1.8} />
           </button>
 
           {/* Modern add-to-cart pill */}
-          <div className="absolute inset-x-0 bottom-0 z-[2] flex justify-center px-3 pb-3 opacity-0 translate-y-3 transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-y-0 group-hover:opacity-100 max-sm:translate-y-0 max-sm:opacity-100">
+          <div className="absolute inset-x-0 bottom-0 z-[2] flex justify-center px-3 pb-3 opacity-0 translate-y-3 transition-[transform,opacity] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:translate-y-0 group-hover:opacity-100 max-sm:translate-y-0 max-sm:opacity-100">
             <button
               type="button"
               aria-label={`افزودن ${product.name} به سبد خرید`}
               onClick={handleQuickAdd}
               disabled={outOfStock}
-              className="btn-gold-modern w-full !rounded-full !px-5 !py-3 !text-xs disabled:cursor-not-allowed disabled:opacity-40"
+              className="btn-gold-modern focus-ring w-full !rounded-full !px-5 !py-3 !text-xs disabled:cursor-not-allowed disabled:opacity-40"
             >
               {outOfStock ? (
                 <span className="flex w-full items-center justify-center gap-2">
@@ -128,7 +128,7 @@ export const RozhinaProductCard = ({ product, onQuickView }) => {
                     transition={{ type: 'spring', stiffness: 420, damping: 18 }}
                     className="flex items-center justify-center gap-2"
                   >
-                    <Check size={15} strokeWidth={3} />
+                    <Check size={15} strokeWidth={3} className="animate-badge-pop" />
                     {t(content.card.addedToCart)}
                   </motion.span>
                 ) : (
@@ -207,4 +207,4 @@ export const RozhinaProductCard = ({ product, onQuickView }) => {
       </motion.article>
     </SpotlightCard>
   );
-};
+});

@@ -1,3 +1,4 @@
+import { useCallback } from 'react';
 import { SearchX } from 'lucide-react';
 import { RozhinaProductCard } from './RozhinaProductCard';
 import { Stagger, StaggerItem } from './motion/Reveal';
@@ -5,6 +6,11 @@ import { useContent } from '../context/ContentContext';
 
 export const ProductGrid = ({ products, onQuickView }) => {
   const { content } = useContent();
+  // Stable identity so React.memo'd cards skip re-renders on parent updates.
+  const handleQuickView = useCallback(
+    (product) => onQuickView?.(product),
+    [onQuickView],
+  );
 
   if (products.length === 0) {
     return (
@@ -24,7 +30,7 @@ export const ProductGrid = ({ products, onQuickView }) => {
     <Stagger className="grid grid-cols-2 gap-x-5 gap-y-10 md:gap-x-7 lg:grid-cols-3 md:gap-y-14">
       {products.map((product) => (
         <StaggerItem key={product.id}>
-          <RozhinaProductCard product={product} onQuickView={onQuickView} />
+          <RozhinaProductCard product={product} onQuickView={handleQuickView} />
         </StaggerItem>
       ))}
     </Stagger>

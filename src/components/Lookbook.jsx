@@ -46,14 +46,14 @@ export const Lookbook = () => {
           >
             <a
               href="#collection"
-              className="group relative block overflow-hidden rounded-xl border border-white/5 transition-all duration-500 hover:border-gold/25 hover:shadow-gold-glow"
+              className="group relative block overflow-hidden rounded-xl border border-white/5 transition-[border-color,box-shadow] duration-500 hover:border-gold/25 hover:shadow-gold-glow"
             >
-              <div className="aspect-[3/4] overflow-hidden will-change-transform">
+              <div className="aspect-[3/4] overflow-hidden group-hover:will-change-transform">
                 <img
                   src={shot.src || SHOT_IMAGES[i % SHOT_IMAGES.length]}
                   alt={shot.label}
                   loading="lazy"
-                  className="h-full w-full object-cover brightness-[0.85] transition-transform duration-[1200ms] ease-out group-hover:scale-[1.05]"
+                  className="h-full w-full origin-center object-cover brightness-[0.85] transition-transform duration-[1200ms] ease-out group-hover:scale-[1.05]"
                   onError={withImageFallback}
                 />
               </div>
@@ -68,7 +68,7 @@ export const Lookbook = () => {
               <ArrowUpLeft
                 size={18}
                 strokeWidth={1.5}
-                className="absolute left-4 top-4 -translate-x-2 -translate-y-2 text-gold opacity-0 transition-all duration-500 group-hover:translate-x-0 group-hover:translate-y-0 group-hover:opacity-100"
+                className="absolute left-4 top-4 -translate-x-2 -translate-y-2 text-gold opacity-0 transition-[transform,opacity] duration-500 group-hover:translate-x-0 group-hover:translate-y-0 group-hover:opacity-100"
               />
             </a>
           </StaggerItem>
