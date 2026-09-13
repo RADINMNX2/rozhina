@@ -33,7 +33,7 @@ export const PRODUCTS = [
     colors: [{ label: "کلاسیک", hex: "#E2C997" }],
     price: 4750000,
     oldPrice: 5000000,
-    quantity: 0,
+    quantity: 7,
     badges: ["کالکشن جدید"],
     description: "شال ابریشم توییل کیفیت بشدت خوب.",
     images: [photo("photo-1520006403909-838d6b92c22e")],
