@@ -15,7 +15,7 @@ export const FeaturesBand = () => {
           const Icon = ICONS[i % ICONS.length];
           return (
             <Reveal key={i} delay={i * 100}>
-              <div className="group flex h-full items-center gap-5 rounded-2xl border border-white/5 bg-white/[0.03] p-6 backdrop-blur-xl transition-all duration-500 hover:border-gold/25 hover:bg-gold/[0.03]">
+              <div className="group flex h-full items-center gap-5 rounded-2xl border border-white/5 bg-white/[0.03] p-6 transition-[transform,border-color,background-color] duration-500 hover:-translate-y-1 hover:border-gold/25 hover:bg-gold/[0.03]">
                 <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-gold/25 bg-gold/[0.08] text-gold shadow-dot-glow transition-transform duration-500 group-hover:scale-105">
                   <Icon size={22} strokeWidth={1.5} />
                 </span>

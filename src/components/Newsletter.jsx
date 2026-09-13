@@ -38,7 +38,7 @@ export const Newsletter = () => {
         <Reveal delay={120} className="w-full max-w-md">
           <form onSubmit={submit}>
             {done ? (
-              <div className="flex items-center gap-3 border border-gold/25 bg-gold/[0.06] px-5 py-4 backdrop-blur-xl">
+              <div className="flex items-center gap-3 border border-gold/25 bg-gold/[0.06] px-5 py-4">
                 <MailCheck size={20} className="shrink-0 text-gold" strokeWidth={1.5} />
                 <p className="text-sm font-medium text-pearl">
                   {c.success}

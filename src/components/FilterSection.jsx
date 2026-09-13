@@ -34,7 +34,7 @@ export const FilterSection = ({ fabric, setFabric, color, setColor, sort, setSor
           key={f}
           type="button"
           onClick={() => setFabric(f)}
-          className={`whitespace-nowrap rounded-full border px-5 py-2.5 text-[13px] font-medium transition-all duration-300 active:scale-[0.97] ${
+          className={`whitespace-nowrap rounded-full border px-5 py-2.5 text-[13px] font-medium transition-[transform,box-shadow,border-color,background-color] duration-300 active:scale-[0.97] focus-ring ${
             fabric === f
               ? 'border-gold/35 bg-gold/10 text-gold shadow-[0_8px_24px_-8px_rgba(226,201,151,0.45)]'
               : 'border-white/10 bg-transparent text-pearl/60 hover:border-gold/40 hover:text-pearl'
@@ -68,7 +68,7 @@ export const FilterSection = ({ fabric, setFabric, color, setColor, sort, setSor
               aria-label={`فیلتر رنگ ${c.label}`}
               aria-pressed={isActive}
               onClick={() => setColor(isActive ? null : c.hex)}
-              className={`relative flex h-8 w-8 items-center justify-center rounded-full transition-all duration-300 ${
+              className={`relative flex h-8 w-8 items-center justify-center rounded-full transition-[transform,box-shadow] duration-300 ${
                 isActive
                   ? 'ring-2 ring-gold shadow-dot-glow ring-offset-2 ring-offset-obsidian'
                   : 'ring-1 ring-inset ring-white/15 hover:scale-110'
@@ -89,7 +89,7 @@ export const FilterSection = ({ fabric, setFabric, color, setColor, sort, setSor
           <select
             value={sort}
             onChange={(e) => setSort(e.target.value)}
-            className="appearance-none rounded-full border border-white/10 bg-obsidian/60 py-2.5 pl-8 pr-4 text-[13px] font-medium text-pearl outline-none backdrop-blur-xl transition-colors hover:border-gold/40 focus:border-gold/60"
+            className="appearance-none rounded-full border border-white/10 bg-[#0F0E0D]/90 py-2.5 pl-8 pr-4 text-[13px] font-medium text-pearl outline-none transition-colors hover:border-gold/40 focus:border-gold/60 focus-ring"
             aria-label="مرتب‌سازی محصولات"
           >
             {SORTS.map((s) => (

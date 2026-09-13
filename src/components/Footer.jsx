@@ -21,7 +21,7 @@ export const Footer = () => {
           href={settings.instagramUrl}
           target="_blank"
           rel="noreferrer"
-          className="mt-6 inline-flex items-center gap-2.5 rounded-full border border-gold/25 bg-gold/[0.06] px-5 py-2.5 text-xs font-semibold text-gold backdrop-blur-xl transition-all duration-300 hover:bg-gold hover:text-obsidian hover:shadow-gold-cta active:scale-[0.98]"
+          className="mt-6 inline-flex items-center gap-2.5 rounded-full border border-gold/25 bg-gold/[0.06] px-5 py-2.5 text-xs font-semibold text-gold transition-[background-color,box-shadow,transform] duration-300 hover:bg-gold hover:text-obsidian hover:shadow-gold-cta active:scale-[0.98] focus-ring"
         >
           <Instagram size={15} strokeWidth={1.6} />
           {settings.instagramHandle}
@@ -111,7 +111,7 @@ export const Footer = () => {
             onClick={openAdmin}
             aria-label="پنل مدیریت فروشگاه"
             title="مدیریت"
-            className="flex h-7 w-7 items-center justify-center rounded-full text-pearl/25 transition-all duration-300 hover:bg-gold/10 hover:text-gold active:scale-90"
+            className="focus-ring flex h-7 w-7 items-center justify-center rounded-full text-pearl/25 transition-[background-color,color,transform] duration-300 hover:bg-gold/10 hover:text-gold active:scale-90"
           >
             <Lock size={12} strokeWidth={1.6} />
           </button>

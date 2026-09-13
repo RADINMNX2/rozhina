@@ -22,7 +22,7 @@ const IconButton = ({ label, onClick, children }) => (
     type="button"
     aria-label={label}
     onClick={onClick}
-    className="relative flex h-10 w-10 items-center justify-center rounded-full text-pearl/75 transition-all duration-300 hover:bg-white/[0.06] hover:text-gold active:scale-[0.94]"
+    className="focus-ring relative flex h-10 w-10 items-center justify-center rounded-full text-pearl/75 transition-[background-color,color,transform] duration-300 hover:bg-white/[0.06] hover:text-gold active:scale-[0.94]"
   >
     {children}
   </button>
@@ -38,7 +38,15 @@ export const Header = ({ onOpenCart, onOpenSearch }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 12);
+    let ticking = false;
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(() => {
+        setScrolled(window.scrollY > 12);
+        ticking = false;
+      });
+    };
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
@@ -54,10 +62,10 @@ export const Header = ({ onOpenCart, onOpenSearch }) => {
   return (
     <>
       <header
-        className={`sticky top-0 z-40 border-b backdrop-blur-lg transition-all duration-500 ${
+        className={`sticky top-0 z-40 border-b backdrop-blur-md transition-[background-color,border-color,box-shadow] duration-500 ${
           scrolled
-            ? 'border-white/[0.06] bg-obsidian/85 shadow-nav-float'
-            : 'border-white/[0.04] bg-obsidian/55'
+            ? 'border-white/[0.06] bg-[#0F0E0D]/95 shadow-nav-float'
+            : 'border-white/[0.04] bg-[#0F0E0D]/85'
         }`}
       >
         <div className="container-lux">
@@ -76,7 +84,7 @@ export const Header = ({ onOpenCart, onOpenSearch }) => {
               </IconButton>
             </div>
 
-            <a href="#home" className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+            <a href="#home" className="absolute start-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
               <Logo compact />
             </a>
 
@@ -89,14 +97,14 @@ export const Header = ({ onOpenCart, onOpenSearch }) => {
                 <Heart
                   size={20}
                   strokeWidth={1.5}
-                  className={`transition-all duration-300 ${
+                  className={`transition-[fill,color] duration-300 ${
                     wishlistCount > 0
                       ? 'fill-gold stroke-gold drop-shadow-[0_0_8px_rgba(226,201,151,0.5)]'
                       : 'text-pearl/75'
                   }`}
                 />
                 {wishlistCount > 0 && (
-                  <span className="absolute -right-0.5 -top-0.5">
+                  <span className="absolute -end-0.5 -top-0.5">
                     <Badge count={wishlistCount} />
                   </span>
                 )}
@@ -106,7 +114,7 @@ export const Header = ({ onOpenCart, onOpenSearch }) => {
                 <ShoppingBag size={20} strokeWidth={1.5} />
                 {/* eslint-disable-next-line react/no-array-index-key */}
                 {totalItems > 0 && (
-                  <span className="absolute -right-0.5 -top-0.5">
+                  <span className="absolute -end-0.5 -top-0.5">
                     <Badge count={totalItems} />
                   </span>
                 )}
@@ -128,7 +136,7 @@ export const Header = ({ onOpenCart, onOpenSearch }) => {
           onClick={() => setMobileOpen(false)}
         />
         <aside
-          className={`absolute right-0 top-0 flex h-full w-[86%] max-w-sm flex-col border-l border-white/[0.06] bg-[#0F0E0D]/95 backdrop-blur-xl shadow-nav-float transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+          className={`absolute inset-inline-end-0 top-0 flex h-full w-[86%] max-w-sm flex-col border-s border-white/[0.06] bg-[#0F0E0D]/97 shadow-nav-float transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
             mobileOpen ? 'translate-x-0' : 'translate-x-full'
           }`}
         >

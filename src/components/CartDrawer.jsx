@@ -79,7 +79,7 @@ export const CartDrawer = ({ open, onClose }) => {
           aria-modal="true"
         >
           <motion.div
-            className="absolute inset-0 bg-obsidian/70 backdrop-blur-md"
+            className="absolute inset-0 bg-obsidian/70"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -88,7 +88,7 @@ export const CartDrawer = ({ open, onClose }) => {
           />
 
           <motion.aside
-            className="absolute left-0 top-0 flex h-full w-full max-w-md flex-col border-l border-white/[0.06] bg-[#121110] shadow-nav-float"
+            className="absolute inset-inline-start-0 top-0 flex h-full w-full max-w-md flex-col border-s border-white/[0.06] bg-[#121110] shadow-nav-float"
             initial={{ x: '-100%' }}
             animate={{ x: 0 }}
             exit={{ x: '-100%' }}
@@ -106,7 +106,7 @@ export const CartDrawer = ({ open, onClose }) => {
                 type="button"
                 aria-label="بستن سبد"
                 onClick={onClose}
-                className="flex h-9 w-9 items-center justify-center rounded-full text-pearl/70 transition-colors hover:bg-white/5 hover:text-pearl active:scale-95"
+                className="flex h-9 w-9 items-center justify-center rounded-full text-pearl/70 transition-colors hover:bg-white/5 hover:text-pearl active:scale-95 focus-ring"
               >
                 <X size={18} strokeWidth={1.5} />
               </button>
@@ -123,8 +123,8 @@ export const CartDrawer = ({ open, onClose }) => {
               </p>
               <div className="mt-2 h-[3px] overflow-hidden rounded-full bg-white/10">
                 <div
-                  className="h-full rounded-full bg-gradient-to-r from-bronze via-gold to-gold shadow-[0_0_10px_rgba(226,201,151,0.6)] transition-all duration-700 ease-out"
-                  style={{ width: `${progress}%` }}
+                  className="h-full w-full origin-right rounded-full bg-gradient-to-r from-bronze via-gold to-gold shadow-[0_0_10px_rgba(226,201,151,0.6)] transition-transform duration-700 ease-out"
+                  style={{ transform: `scaleX(${progress / 100})` }}
                 />
               </div>
             </div>
@@ -150,7 +150,7 @@ export const CartDrawer = ({ open, onClose }) => {
                 <ul className="divide-y divide-white/[0.06]">
                   {items.map(({ product, qty, colorHex }) => (
                     <li key={product.id} className="flex gap-4 py-5">
-                      <div className="relative aspect-[3/4] w-20 shrink-0 overflow-hidden rounded-lg border border-white/5 bg-white/[0.02] will-change-transform">
+                      <div className="relative aspect-[3/4] w-20 shrink-0 overflow-hidden rounded-lg border border-white/5 bg-white/[0.02]">
                         <img
                           src={product.images[0]}
                           alt={product.name}
@@ -174,7 +174,7 @@ export const CartDrawer = ({ open, onClose }) => {
                                     type="button"
                                     aria-label={`رنگ ${c.label}`}
                                     onClick={() => setColor(product.id, c.hex)}
-                                    className={`h-4 w-4 rounded-full transition-all ${
+                                    className={`h-4 w-4 rounded-full transition-[transform,box-shadow] duration-300 ${
                                       colorHex === c.hex
                                         ? 'ring-2 ring-gold ring-offset-1 ring-offset-[#121110] shadow-dot-glow'
                                         : 'ring-1 ring-inset ring-white/15 hover:scale-110'
@@ -185,11 +185,11 @@ export const CartDrawer = ({ open, onClose }) => {
                               </div>
                             )}
                           </div>
-                          <button
-                            type="button"
-                            aria-label="حذف از سبد"
-                            onClick={() => removeItem(product.id)}
-                            className="text-taupe/60 transition-colors hover:text-terracotta active:scale-90"
+<button
+                    type="button"
+                    aria-label="حذف از سبد"
+                    onClick={() => removeItem(product.id)}
+                    className="text-taupe/60 transition-colors hover:text-terracotta active:scale-90 focus-ring rounded-full"
                           >
                             <Trash2 size={15} strokeWidth={1.6} />
                           </button>
@@ -260,7 +260,7 @@ export const CartDrawer = ({ open, onClose }) => {
                 <MagneticButton
                   onClick={handlePay}
                   disabled={!paymentBase || paying}
-                  className="mt-3 flex w-full items-center justify-center gap-2 rounded-full border border-gold/30 bg-transparent px-6 py-4 text-sm font-bold text-gold transition-all duration-300 hover:border-gold/60 hover:bg-gold/5 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="focus-ring mt-3 flex w-full items-center justify-center gap-2 rounded-full border border-gold/30 bg-transparent px-6 py-4 text-sm font-bold text-gold transition-[background-color,border-color,transform] duration-300 hover:border-gold/60 hover:bg-gold/5 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {paying ? 'در حال اتصال…' : (
                     <>
@@ -273,7 +273,7 @@ export const CartDrawer = ({ open, onClose }) => {
                   <p className="mt-2 text-center text-[11px] leading-5 text-terracotta">{payError}</p>
                 )}
 
-                <div className="mt-3 flex items-center justify-center gap-4 text-[11px] text-taupe">
+                <div className="mt-3 flex items-center justify-center gap-4 text-[11px] text-taupe transition-transform duration-300 hover:-translate-y-0.5">
                   <span>{content.cart.trustBadge1}</span>
                   <span className="h-1 w-1 rounded-full bg-gold shadow-[0_0_6px_rgba(226,201,151,0.7)]" />
                   <span>{content.cart.trustBadge2}</span>

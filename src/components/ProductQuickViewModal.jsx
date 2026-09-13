@@ -10,6 +10,7 @@ import { FabricMagnifier } from './FabricMagnifier';
 import { MagneticButton } from './MagneticButton';
 import { useFocusTrap } from '../hooks/useFocusTrap';
 import { useScrollLock } from '../hooks/useScrollLock';
+import { useReducedMotion } from '../hooks/useReducedMotion';
 
 const MODAL_SPRING = { type: 'spring', damping: 28, stiffness: 260, mass: 0.8 };
 
@@ -28,8 +29,10 @@ export const ProductQuickViewModal = ({ product, onClose }) => {
   const { addItem, setColor } = useCart();
   const { content: c } = useContent();
   const isMobile = useIsMobile();
+  const reduced = useReducedMotion();
   const scrollRef = useRef(null);
   const dialogRef = useRef(null);
+  const addInFlight = useRef(false);
   const [selectedHex, setSelectedHex] = useState(null);
   const [added, setAdded] = useState(false);
   const [canDrag, setCanDrag] = useState(true);
@@ -54,11 +57,15 @@ export const ProductQuickViewModal = ({ product, onClose }) => {
   };
 
   const handleAdd = () => {
-    if (outOfStock) return;
+    if (outOfStock || addInFlight.current) return;
+    addInFlight.current = true;
     addItem(product.id, 1);
     setColor(product.id, selectedHex);
     setAdded(true);
-    window.setTimeout(() => setAdded(false), 1600);
+    window.setTimeout(() => {
+      addInFlight.current = false;
+      setAdded(false);
+    }, 1600);
   };
 
   const content = (
@@ -129,7 +136,7 @@ export const ProductQuickViewModal = ({ product, onClose }) => {
                   aria-label={`رنگ ${c.label}`}
                   aria-pressed={active}
                   onClick={() => setSelectedHex(c.hex)}
-                  className={`h-10 w-10 rounded-full transition-all duration-300 ${
+                  className={`h-10 w-10 rounded-full transition-[transform,box-shadow] duration-300 ${
                     active
                       ? 'ring-2 ring-gold shadow-dot-glow ring-offset-2 ring-offset-[#121110]'
                       : 'ring-1 ring-inset ring-white/15 hover:scale-110'
@@ -227,7 +234,7 @@ export const ProductQuickViewModal = ({ product, onClose }) => {
         onClick={onClose}
       >
         <motion.div
-          className="absolute inset-0 bg-obsidian/80 backdrop-blur-lg"
+          className="absolute inset-0 bg-obsidian/80"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -236,19 +243,29 @@ export const ProductQuickViewModal = ({ product, onClose }) => {
 
         <motion.div
           onClick={(e) => e.stopPropagation()}
-          drag={isMobile && canDrag ? 'y' : false}
+          drag={!reduced && isMobile && canDrag ? 'y' : false}
           dragConstraints={{ top: 0, bottom: 0 }}
           dragElastic={0.18}
           onDragEnd={(_, info) => {
             if (info.offset.y > 90 || info.velocity.y > 700) onClose();
           }}
           initial={
-            isMobile ? { y: '100%' } : { opacity: 0, scale: 0.95, y: 14 }
+            reduced
+              ? { opacity: 0 }
+              : isMobile
+                ? { y: '100%' }
+                : { opacity: 0, scale: 0.95, y: 14 }
           }
-          animate={isMobile ? { y: 0 } : { opacity: 1, scale: 1, y: 0 }}
-          exit={isMobile ? { y: '100%' } : { opacity: 0, scale: 0.95, y: 14 }}
-          transition={MODAL_SPRING}
-          className={`quickview-sheet relative flex w-full flex-col overflow-hidden border-white/10 bg-[#121110]/95 backdrop-blur-2xl shadow-[0_25px_60px_rgba(0,0,0,0.8)] ${
+          animate={reduced ? { opacity: 1 } : isMobile ? { y: 0 } : { opacity: 1, scale: 1, y: 0 }}
+          exit={
+            reduced
+              ? { opacity: 0 }
+              : isMobile
+                ? { y: '100%' }
+                : { opacity: 0, scale: 0.95, y: 14 }
+          }
+          transition={reduced ? { duration: 0.15 } : MODAL_SPRING}
+          className={`quickview-sheet relative flex w-full flex-col overflow-hidden border-white/10 bg-[#121110]/97 shadow-[0_25px_60px_rgba(0,0,0,0.8)] ${
             isMobile
               ? 'justify-start rounded-t-3xl border-t'
               : 'max-w-4xl rounded-3xl border'
@@ -258,7 +275,7 @@ export const ProductQuickViewModal = ({ product, onClose }) => {
             type="button"
             aria-label="بستن"
             onClick={onClose}
-            className="absolute left-4 top-4 z-20 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/10 bg-obsidian/60 text-pearl/80 backdrop-blur-md transition-all duration-500 hover:rotate-90 hover:border-gold/40 hover:text-gold active:scale-90 md:top-6 md:left-6"
+            className="focus-ring absolute left-4 top-4 z-20 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/10 bg-obsidian/60 text-pearl/80 transition-[transform,border-color,color,background-color] duration-500 hover:rotate-90 hover:border-gold/40 hover:text-gold active:scale-90 md:top-6 md:left-6"
           >
             <X size={18} strokeWidth={1.8} />
           </button>

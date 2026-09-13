@@ -37,7 +37,7 @@ export const SearchOverlay = ({ open, onClose, onSelect }) => {
   return (
     <div
       ref={dialogRef}
-      className={`fixed inset-0 z-[60] bg-obsidian/[0.97] backdrop-blur-xl transition-opacity duration-500 ${
+      className={`fixed inset-0 z-[60] bg-obsidian/[0.97] transition-opacity duration-500 ${
         open ? 'animate-fade-in opacity-100' : 'pointer-events-none opacity-0'
       }`}
       role="dialog"
@@ -63,7 +63,7 @@ export const SearchOverlay = ({ open, onClose, onSelect }) => {
             type="button"
             aria-label="بستن جستجو"
             onClick={onClose}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-pearl/70 transition-colors hover:bg-white/5 hover:text-pearl active:scale-95"
+            className="focus-ring flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-pearl/70 transition-colors hover:bg-white/5 hover:text-pearl active:scale-95"
           >
             <X size={20} strokeWidth={1.5} />
           </button>
@@ -88,7 +88,7 @@ export const SearchOverlay = ({ open, onClose, onSelect }) => {
                       onClose();
                       onSelect(product);
                     }}
-                    className="flex w-full items-center gap-4 rounded-lg py-4 text-right transition-colors hover:bg-white/[0.03]"
+                    className="focus-ring flex w-full items-center gap-4 rounded-lg py-4 text-right transition-colors hover:bg-white/[0.03]"
                   >
                     <span className="relative aspect-[3/4] w-14 shrink-0 overflow-hidden rounded-md border border-white/5 bg-white/[0.02]">
                       <img
