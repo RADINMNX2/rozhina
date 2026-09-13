@@ -5,6 +5,8 @@ import { useContent } from '../context/ContentContext';
 import { formatPrice, toFa } from '../utils/format';
 import { t } from '../utils/text';
 import { withImageFallback } from '../utils/imageFallback';
+import { useFocusTrap } from '../hooks/useFocusTrap';
+import { useScrollLock } from '../hooks/useScrollLock';
 
 export const SearchOverlay = ({ open, onClose, onSelect }) => {
   const { products } = useProducts();
@@ -12,23 +14,17 @@ export const SearchOverlay = ({ open, onClose, onSelect }) => {
   const c = content.search ?? {};
   const [query, setQuery] = useState('');
   const inputRef = useRef(null);
+  const dialogRef = useRef(null);
+
+  useScrollLock(open);
+  useFocusTrap(dialogRef, { active: open, onEscape: onClose });
 
   useEffect(() => {
     if (open) {
       setQuery('');
       window.setTimeout(() => inputRef.current?.focus(), 120);
-      document.body.style.overflow = 'hidden';
     }
-    return () => {
-      document.body.style.overflow = '';
-    };
   }, [open]);
-
-  useEffect(() => {
-    const onKey = (e) => e.key === 'Escape' && onClose();
-    if (open) window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [open, onClose]);
 
   const results = useMemo(() => {
     const q = query.trim();
@@ -40,10 +36,12 @@ export const SearchOverlay = ({ open, onClose, onSelect }) => {
 
   return (
     <div
+      ref={dialogRef}
       className={`fixed inset-0 z-[60] bg-obsidian/[0.97] backdrop-blur-xl transition-opacity duration-500 ${
         open ? 'animate-fade-in opacity-100' : 'pointer-events-none opacity-0'
       }`}
       role="dialog"
+      aria-modal="true"
       aria-label="جستجو در کالکشن"
       onClick={onClose}
     >

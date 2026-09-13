@@ -8,6 +8,8 @@ import { useContent } from '../context/ContentContext';
 import { t } from '../utils/text';
 import { FabricMagnifier } from './FabricMagnifier';
 import { MagneticButton } from './MagneticButton';
+import { useFocusTrap } from '../hooks/useFocusTrap';
+import { useScrollLock } from '../hooks/useScrollLock';
 
 const MODAL_SPRING = { type: 'spring', damping: 28, stiffness: 260, mass: 0.8 };
 
@@ -27,31 +29,19 @@ export const ProductQuickViewModal = ({ product, onClose }) => {
   const { content: c } = useContent();
   const isMobile = useIsMobile();
   const scrollRef = useRef(null);
+  const dialogRef = useRef(null);
   const [selectedHex, setSelectedHex] = useState(null);
   const [added, setAdded] = useState(false);
   const [canDrag, setCanDrag] = useState(true);
+
+  useScrollLock(!!product);
+  useFocusTrap(dialogRef, { active: !!product, onEscape: onClose });
 
   useEffect(() => {
     setSelectedHex(product?.colors?.[0]?.hex ?? null);
     setAdded(false);
     setCanDrag(true);
   }, [product]);
-
-  useEffect(() => {
-    if (!product) return undefined;
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = prev;
-    };
-  }, [product]);
-
-  useEffect(() => {
-    if (!product) return undefined;
-    const onKey = (e) => e.key === 'Escape' && onClose();
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [product, onClose]);
 
   if (!product) return null;
 
@@ -229,6 +219,7 @@ export const ProductQuickViewModal = ({ product, onClose }) => {
   return (
     <AnimatePresence>
       <motion.div
+        ref={dialogRef}
         className="fixed inset-0 z-[80] flex items-end justify-center md:items-center md:p-6"
         role="dialog"
         aria-modal="true"

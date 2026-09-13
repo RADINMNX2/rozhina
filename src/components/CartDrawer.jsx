@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { CreditCard, Minus, Plus, ShoppingBag, Trash2, X } from 'lucide-react';
 import { useCart } from '../context/CartContext';
@@ -9,6 +9,8 @@ import { t } from '../utils/text';
 import { buildOrderMessage, buildWhatsAppLink } from '../utils/whatsapp';
 import { MagneticButton } from './MagneticButton';
 import { withImageFallback } from '../utils/imageFallback';
+import { useFocusTrap } from '../hooks/useFocusTrap';
+import { useScrollLock } from '../hooks/useScrollLock';
 
 const DRAWER_SPRING = { type: 'spring', damping: 32, stiffness: 280, mass: 0.85 };
 
@@ -16,24 +18,15 @@ export const CartDrawer = ({ open, onClose }) => {
   const { items, totalItems, subtotal, increment, decrement, removeItem, setColor } = useCart();
   const { settings } = useSettings();
   const { content } = useContent();
+  const dialogRef = useRef(null);
   const [paying, setPaying] = useState(false);
   const [payError, setPayError] = useState('');
 
   const threshold = Math.max(Number(settings.freeShippingThreshold) || 0, 0);
   const paymentBase = String(settings.paymentUrl || '').replace(/\/+$/, '');
 
-  useEffect(() => {
-    document.body.style.overflow = open ? 'hidden' : '';
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [open]);
-
-  useEffect(() => {
-    const onKey = (e) => e.key === 'Escape' && onClose();
-    if (open) window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [open, onClose]);
+  useScrollLock(open);
+  useFocusTrap(dialogRef, { active: open, onEscape: onClose });
 
   const remaining = Math.max(threshold - subtotal, 0);
   const progress = threshold > 0 ? Math.min((subtotal / threshold) * 100, 100) : 100;
@@ -79,6 +72,7 @@ export const CartDrawer = ({ open, onClose }) => {
     <AnimatePresence>
       {open && (
         <motion.div
+          ref={dialogRef}
           className="fixed inset-0 z-[60]"
           role="dialog"
           aria-label={content.cart.title}
