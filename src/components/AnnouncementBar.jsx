@@ -25,7 +25,7 @@ export const AnnouncementBar = () => {
   return (
     <div className="border-b border-white/[0.05] bg-[#0B0A09] text-pearl/85" aria-hidden="true">
       <div dir="ltr" className="overflow-hidden py-2">
-        <div className="flex w-max animate-marquee whitespace-nowrap">
+        <div className="flex w-max animate-marquee whitespace-nowrap motion-reduce:animate-none hover:[animation-play-state:paused]">
           <div className="flex items-center" aria-hidden="false">
             {ITEM}
             {ITEM}

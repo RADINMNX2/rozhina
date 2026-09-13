@@ -3,6 +3,7 @@ import { ArrowDown } from 'lucide-react';
 import { toFa } from '../utils/format';
 import { withImageFallback } from '../utils/imageFallback';
 import { useContent } from '../context/ContentContext';
+import { useReducedMotion } from '../hooks/useReducedMotion';
 
 const photo = (id) => `https://images.unsplash.com/${id}?auto=format&fit=crop&w=1800&q=80`;
 
@@ -14,12 +15,14 @@ const SLIDES = [
 
 export const Hero = () => {
   const { content } = useContent();
+  const reduced = useReducedMotion();
   const [active, setActive] = useState(0);
 
   useEffect(() => {
+    if (reduced) return undefined;
     const timer = setInterval(() => setActive((a) => (a + 1) % SLIDES.length), 6000);
     return () => clearInterval(timer);
-  }, []);
+  }, [reduced]);
 
   return (
     <section id="home" className="relative h-[88svh] max-h-[820px] min-h-[580px] overflow-hidden">
@@ -38,9 +41,9 @@ export const Hero = () => {
       ))}
 
       {/* Ambient gold light orbiting the fabric */}
-      <div className="ambient-still animate-ambient pointer-events-none absolute right-[6%] top-1/2 h-[58vmin] w-[58vmin] -translate-y-1/2 rounded-full bg-[radial-gradient(circle_at_center,rgba(226,201,151,0.16),transparent_62%)] blur-2xl" />
+      <div className="animate-ambient pointer-events-none absolute right-[6%] top-1/2 h-[58vmin] w-[58vmin] -translate-y-1/2 rounded-full bg-[radial-gradient(circle_at_center,rgba(226,201,151,0.16),transparent_62%)] blur-xl" />
       <div
-        className="ambient-still pointer-events-none absolute bottom-[8%] right-[42%] h-40 w-40 rounded-full bg-[radial-gradient(circle_at_center,rgba(196,164,124,0.12),transparent_65%)] blur-xl"
+        className="pointer-events-none absolute bottom-[8%] right-[42%] h-40 w-40 rounded-full bg-[radial-gradient(circle_at_center,rgba(196,164,124,0.12),transparent_65%)] blur-xl"
         style={{ animationDelay: '-4s' }}
       />
 
@@ -95,10 +98,10 @@ export const Hero = () => {
               type="button"
               aria-label={`اسلاید ${toFa(i + 1)}`}
               onClick={() => setActive(i)}
-              className={`h-[3px] rounded-full transition-all duration-500 active:scale-95 ${
+              className={`h-[3px] w-9 origin-right rounded-full transition-transform duration-500 active:scale-95 ${
                 active === i
-                  ? 'w-9 bg-gold shadow-[0_0_12px_rgba(226,201,151,0.7)]'
-                  : 'w-3.5 bg-white/20 hover:bg-white/45'
+                  ? 'scale-x-100 bg-gold shadow-[0_0_12px_rgba(226,201,151,0.7)]'
+                  : 'scale-x-[0.39] bg-white/20 hover:bg-white/45'
               }`}
             />
           ))}
