@@ -17,64 +17,108 @@ export const Lookbook = () => {
   const { content } = useContent();
   const shots = content.lookbook.shots ?? [];
 
-  return (
-  <section
-    id="lookbook"
-    className="relative scroll-mt-24 overflow-hidden border-y border-white/[0.05] bg-charcoal/50 py-20 md:py-28"
-  >
-    <div className="pointer-events-none absolute inset-x-0 top-0 h-64 bg-[radial-gradient(ellipse_at_bottom,rgba(226,201,151,0.05),transparent_65%)]" />
-    <div className="container-lux relative">
-      <Reveal>
-        <div className="flex flex-col items-center text-center">
-          <span className="eyebrow inline-flex items-center gap-3">
-            <span className="h-px w-8 bg-gold shadow-[0_0_8px_rgba(226,201,151,0.5)]" />
-            LOOKBOOK
-            <span className="h-px w-8 bg-gold shadow-[0_0_8px_rgba(226,201,151,0.5)]" />
-          </span>
-          <h2 className="mt-4 text-2xl font-bold text-pearl md:text-4xl">{content.lookbook.title}</h2>
-          <p className="mt-3 max-w-xl text-sm leading-8 text-taupe">
-            {content.lookbook.subtitle}
-          </p>
-        </div>
-      </Reveal>
+  const renderOverlayShot = (shot, i, variant = 'default') => (
+    <a
+      href="#collection"
+      className={`group relative block overflow-hidden rounded-xl border border-white/5 transition-[border-color,box-shadow] duration-500 hover:border-gold/25 hover:shadow-gold-glow ${
+        variant === 'feature' ? 'h-full' : ''
+      }`}
+    >
+      <div
+        className={`overflow-hidden h-full group-hover:will-change-transform ${
+          variant === 'wide' ? 'aspect-[21/9]' : variant === 'feature' ? '' : 'aspect-[3/4]'
+        }`}
+      >
+        <img
+          src={shot.src || SHOT_IMAGES[i % SHOT_IMAGES.length]}
+          alt={shot.label}
+          loading="lazy"
+          className="h-full w-full origin-center object-cover brightness-[0.85] transition-transform duration-[1200ms] ease-out group-hover:scale-[1.05]"
+          onError={withImageFallback}
+        />
+      </div>
+      <div className="absolute inset-0 bg-gradient-to-t from-obsidian/85 via-obsidian/10 to-transparent opacity-85 transition-opacity duration-500 group-hover:opacity-100" />
+      <div className="absolute inset-x-0 bottom-0 p-5">
+        <span className="font-serif text-[9px] tracking-widest text-gold" dir="ltr">
+          LOOK {toFa(i + 1)}
+        </span>
+        <h3 className="mt-1.5 text-sm font-bold text-pearl">{shot.label}</h3>
+        <p className="mt-0.5 text-[11px] text-pearl/70">{shot.sub}</p>
+      </div>
+      <ArrowUpLeft
+        size={18}
+        strokeWidth={1.5}
+        className="absolute left-4 top-4 -translate-x-2 -translate-y-2 text-gold opacity-0 transition-[transform,opacity] duration-500 group-hover:translate-x-0 group-hover:translate-y-0 group-hover:opacity-100"
+      />
+    </a>
+  );
 
-      <Stagger className="mt-12 grid grid-cols-2 gap-3 md:gap-5 lg:grid-cols-4">
-        {shots.map((shot, i) => (
-          <StaggerItem
-            key={i}
-            className={i === 0 ? 'lg:mt-6' : i === 3 ? 'lg:-mt-6' : ''}
-          >
-            <a
-              href="#collection"
-              className="group relative block overflow-hidden rounded-xl border border-white/5 transition-[border-color,box-shadow] duration-500 hover:border-gold/25 hover:shadow-gold-glow"
+  const renderBelowShot = (shot, i) => (
+    <a
+      href="#collection"
+      className="group block rounded-2xl border border-white/5 bg-white/[0.02] p-3 transition-[border-color,background-color] duration-500 hover:border-gold/25"
+    >
+      <div className="aspect-[4/5] overflow-hidden rounded-xl group-hover:will-change-transform">
+        <img
+          src={shot.src || SHOT_IMAGES[i % SHOT_IMAGES.length]}
+          alt={shot.label}
+          loading="lazy"
+          className="h-full w-full origin-center object-cover brightness-[0.9] transition-transform duration-[1200ms] ease-out group-hover:scale-[1.04]"
+          onError={withImageFallback}
+        />
+      </div>
+      <div className="px-2 py-3">
+        <span className="font-serif text-[9px] tracking-widest text-gold" dir="ltr">
+          LOOK {toFa(i + 1)}
+        </span>
+        <h3 className="mt-1 text-sm font-bold text-pearl">{shot.label}</h3>
+        <p className="mt-0.5 text-[11px] leading-5 text-taupe">{shot.sub}</p>
+      </div>
+    </a>
+  );
+
+  return (
+    <section
+      id="lookbook"
+      className="relative scroll-mt-24 overflow-hidden border-y border-white/[0.05] bg-charcoal/50 py-20 md:py-28"
+    >
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-64 bg-[radial-gradient(ellipse_at_bottom,rgba(226,201,151,0.05),transparent_65%)]" />
+      <div className="container-lux relative">
+        <Reveal>
+          <div className="flex flex-col items-center text-center">
+            <span className="eyebrow inline-flex items-center gap-3">
+              <span className="h-px w-8 bg-gold shadow-[0_0_8px_rgba(226,201,151,0.5)]" />
+              LOOKBOOK
+              <span className="h-px w-8 bg-gold shadow-[0_0_8px_rgba(226,201,151,0.5)]" />
+            </span>
+            <h2 className="mt-4 text-2xl font-bold text-pearl md:text-4xl">{content.lookbook.title}</h2>
+            <p className="mt-3 max-w-xl text-sm leading-8 text-taupe">
+              {content.lookbook.subtitle}
+            </p>
+          </div>
+        </Reveal>
+
+        {/* Tablet / desktop: editorial overlay grid */}
+        <Stagger className="mt-12 hidden grid-cols-2 gap-4 md:grid lg:grid-cols-3 md:gap-5">
+          {shots.map((shot, i) => (
+            <StaggerItem
+              key={i}
+              className={`flex ${i === 0 ? 'md:col-span-2 lg:col-span-2 lg:row-span-2' : ''} ${i === 3 ? 'md:col-span-2 lg:col-span-3' : ''}`}
             >
-              <div className="aspect-[3/4] overflow-hidden group-hover:will-change-transform">
-                <img
-                  src={shot.src || SHOT_IMAGES[i % SHOT_IMAGES.length]}
-                  alt={shot.label}
-                  loading="lazy"
-                  className="h-full w-full origin-center object-cover brightness-[0.85] transition-transform duration-[1200ms] ease-out group-hover:scale-[1.05]"
-                  onError={withImageFallback}
-                />
-              </div>
-              <div className="absolute inset-0 bg-gradient-to-t from-obsidian/85 via-obsidian/10 to-transparent opacity-85 transition-opacity duration-500 group-hover:opacity-100" />
-              <div className="absolute inset-x-0 bottom-0 p-5">
-                <span className="font-serif text-[9px] tracking-widest text-gold" dir="ltr">
-                  LOOK {toFa(i + 1)}
-                </span>
-                <h3 className="mt-1.5 text-sm font-bold text-pearl">{shot.label}</h3>
-                <p className="mt-0.5 text-[11px] text-pearl/70">{shot.sub}</p>
-              </div>
-              <ArrowUpLeft
-                size={18}
-                strokeWidth={1.5}
-                className="absolute left-4 top-4 -translate-x-2 -translate-y-2 text-gold opacity-0 transition-[transform,opacity] duration-500 group-hover:translate-x-0 group-hover:translate-y-0 group-hover:opacity-100"
-              />
-            </a>
-          </StaggerItem>
-        ))}
-      </Stagger>
-    </div>
-  </section>
+              {renderOverlayShot(shot, i, i === 0 ? 'feature' : i === 3 ? 'wide' : 'default')}
+            </StaggerItem>
+          ))}
+        </Stagger>
+
+        {/* Mobile: stacked cards with caption below image */}
+        <div className="grid grid-cols-1 gap-6 md:hidden">
+          {shots.map((shot, i) => (
+            <Reveal key={i}>
+              {renderBelowShot(shot, i)}
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
   );
 };
