@@ -8,5 +8,5 @@ compatibility_date = "2024-11-01"
 #    run:  npx wrangler secret put IDPAY_API_KEY
 # =====================================================
 [vars]
-WHATSAPP_NUMBER = "989000000000"
+WHATSAPP_NUMBER = "989363204121"
 SHOP_NAME = "روژینا بوتیک"
