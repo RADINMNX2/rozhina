@@ -6,6 +6,8 @@
   html {
     scroll-behavior: smooth;
     color-scheme: dark;
+    overflow-x: clip;
+    overscroll-behavior-x: none;
   }
 
   body {
@@ -96,6 +98,7 @@
 
   .quickview-sheet {
     max-height: 90vh;
+    max-height: 90svh;
     max-height: 90dvh;
   }
 
@@ -208,6 +211,8 @@
 
   .modal-sheet {
     @apply relative flex w-full flex-col overflow-hidden rounded-t-[28px] bg-[#131211] ring-1 ring-white/[0.08] md:rounded-[28px];
+    max-height: 92vh;
+    max-height: 92svh;
     max-height: 92dvh;
   }
 
@@ -260,12 +265,12 @@
   }
 
   .h-dvh-safe {
-    height: 100vh;
+    height: 100svh;
     height: 100dvh;
   }
 
   .min-h-dvh-safe {
-    min-height: 100vh;
+    min-height: 100svh;
     min-height: 100dvh;
   }
 
