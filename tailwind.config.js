@@ -65,8 +65,8 @@ export default {
           '50%': { opacity: '0.85', transform: 'scale(1.07)' },
         },
         'toast-countdown': {
-          '0%': { width: '100%' },
-          '100%': { width: '0%' },
+          '0%': { transform: 'scaleX(1)' },
+          '100%': { transform: 'scaleX(0)' },
         },
       },
       animation: {

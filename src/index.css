@@ -52,7 +52,7 @@
   }
 
   .card-lux {
-    @apply relative overflow-hidden rounded-2xl border border-white/5 bg-white/[0.03] backdrop-blur-xl;
+    @apply relative overflow-hidden rounded-2xl border border-white/5 bg-white/[0.03];
   }
 
   .eyebrow {
@@ -65,19 +65,19 @@
 
   .lux-link::after {
     content: '';
-    @apply absolute -bottom-1 right-0 h-px w-0 bg-gold transition-all duration-300 ease-out;
+    @apply absolute -bottom-1 right-0 h-px w-full origin-right scale-x-0 bg-gold transition-transform duration-300 ease-out;
   }
 
   .lux-link:hover::after {
-    @apply w-full;
+    @apply scale-x-100;
   }
 
   .btn-gold {
-    @apply inline-flex items-center justify-center gap-2 bg-gradient-to-b from-gold to-bronze px-8 py-4 text-sm font-bold tracking-wide text-obsidian shadow-gold-cta transition-all duration-500 hover:-translate-y-0.5 hover:shadow-gold-glow active:scale-[0.98];
+    @apply inline-flex items-center justify-center gap-2 bg-gradient-to-b from-gold to-bronze px-8 py-4 text-sm font-bold tracking-wide text-obsidian shadow-gold-cta transition-[transform,box-shadow] duration-500 hover:-translate-y-0.5 hover:shadow-gold-glow active:scale-[0.98];
   }
 
   .btn-outline {
-    @apply inline-flex items-center justify-center gap-2 border border-white/15 px-8 py-4 text-sm font-semibold text-pearl transition-all duration-500 hover:border-gold/50 hover:bg-gold/5 hover:text-gold active:scale-[0.98];
+    @apply inline-flex items-center justify-center gap-2 border border-white/15 px-8 py-4 text-sm font-semibold text-pearl transition-[border-color,background-color,color,transform] duration-500 hover:border-gold/50 hover:bg-gold/5 hover:text-gold active:scale-[0.98];
   }
 
   .btn-shimmer {
@@ -156,7 +156,17 @@
   }
 
   .lux-chip {
-    @apply inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-3.5 py-2 text-[11px] font-bold text-pearl/80 transition-all duration-300 hover:border-gold/40 hover:text-gold active:scale-[0.96];
+    @apply inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-3.5 py-2 text-[11px] font-bold text-pearl/80 transition-[border-color,color,transform] duration-300 hover:border-gold/40 hover:text-gold active:scale-[0.96];
+  }
+
+  .focus-ring:focus-visible {
+    outline: 2px solid rgba(226, 201, 151, 0.85);
+    outline-offset: 2px;
+    border-radius: inherit;
+  }
+
+  .glass-soft {
+    @apply border border-white/5 bg-glass;
   }
 
   .no-scrollbar::-webkit-scrollbar {
@@ -215,7 +225,7 @@
   }
 
   .ambient-still {
-    will-change: opacity, transform;
+    /* compositor hint applied on hover only — never permanent */
   }
 }
 
@@ -227,5 +237,19 @@
   85%,
   100% {
     transform: translateX(160%) skewX(-18deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  html {
+    scroll-behavior: auto;
   }
 }
