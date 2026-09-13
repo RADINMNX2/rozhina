@@ -1,10 +1,13 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { useReducedMotion } from '../../hooks/useReducedMotion';
 
 export const EASE = [0.22, 1, 0.36, 1];
 export const SPRING = { type: 'spring', damping: 25, stiffness: 200, mass: 0.9 };
 
 export const Reveal = ({ children, delay = 0, y = 20, once = true, className }) => {
+  const reduced = useReducedMotion();
+  if (reduced) return <div className={className}>{children}</div>;
   return (
     <motion.div
       className={className}
@@ -19,6 +22,8 @@ export const Reveal = ({ children, delay = 0, y = 20, once = true, className }) 
 };
 
 export const Stagger = ({ children, className, stagger = 0.08 }) => {
+  const reduced = useReducedMotion();
+  if (reduced) return <div className={className}>{children}</div>;
   return (
     <motion.div
       className={className}
@@ -36,6 +41,8 @@ export const Stagger = ({ children, className, stagger = 0.08 }) => {
 };
 
 export const StaggerItem = ({ children, className, y = 22 }) => {
+  const reduced = useReducedMotion();
+  if (reduced) return <div className={className}>{children}</div>;
   return (
     <motion.div
       className={className}
@@ -50,6 +57,8 @@ export const StaggerItem = ({ children, className, y = 22 }) => {
 };
 
 export const FadeIn = ({ children, delay = 0, className }) => {
+  const reduced = useReducedMotion();
+  if (reduced) return <div className={className}>{children}</div>;
   return (
     <motion.div
       className={className}
