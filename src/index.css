@@ -13,6 +13,7 @@
     color-scheme: dark;
     text-rendering: optimizeLegibility;
     font-feature-settings: 'ss01';
+    overflow-x: clip;
   }
 
   ::selection {
@@ -199,6 +200,36 @@
   .group:hover .sheen::before {
     transform: translateX(420%) skewX(-18deg);
   }
+
+  /* ---- shared modal language ---- */
+  .modal-backdrop {
+    @apply fixed inset-0 z-[79] bg-black/60;
+  }
+
+  .modal-sheet {
+    @apply relative flex w-full flex-col overflow-hidden rounded-t-[28px] bg-[#131211] ring-1 ring-white/[0.08] md:rounded-[28px];
+    max-height: 92dvh;
+  }
+
+  .modal-card {
+    @apply relative flex max-h-[86vh] w-full max-w-lg flex-col overflow-hidden rounded-[28px] bg-[#131211] shadow-[0_30px_90px_-24px_rgba(0,0,0,0.95)] ring-1 ring-white/[0.08];
+  }
+
+  .modal-handle {
+    @apply mx-auto mt-3 h-1.5 w-12 rounded-full bg-white/15;
+  }
+
+  .modal-header {
+    @apply sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-white/[0.06] bg-[#131211] px-5 py-4 md:px-6;
+  }
+
+  .modal-body {
+    @apply flex-1 overflow-y-auto overscroll-contain px-5 md:px-6;
+  }
+
+  .modal-footer {
+    @apply sticky bottom-0 z-10 border-t border-white/[0.06] bg-[#131211] px-5 py-4 md:px-6 pb-safe;
+  }
 }
 
 @layer utilities {
@@ -226,6 +257,28 @@
 
   .ambient-still {
     /* compositor hint applied on hover only — never permanent */
+  }
+
+  .h-dvh-safe {
+    height: 100vh;
+    height: 100dvh;
+  }
+
+  .min-h-dvh-safe {
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+
+  .scrollbar-hide {
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom);
   }
 }
 
