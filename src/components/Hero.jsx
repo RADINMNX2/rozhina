@@ -25,7 +25,10 @@ export const Hero = () => {
   }, [reduced]);
 
   return (
-    <section id="home" className="relative h-[88svh] max-h-[820px] min-h-[580px] overflow-hidden">
+    <section
+      id="home"
+      className="relative flex min-h-dvh-safe flex-col overflow-hidden md:min-h-[86svh] md:min-h-[620px]"
+    >
       {SLIDES.map((src, i) => (
         <img
           key={src}
@@ -41,18 +44,18 @@ export const Hero = () => {
       ))}
 
       {/* Ambient gold light orbiting the fabric */}
-      <div className="animate-ambient pointer-events-none absolute right-[6%] top-1/2 h-[58vmin] w-[58vmin] -translate-y-1/2 rounded-full bg-[radial-gradient(circle_at_center,rgba(226,201,151,0.16),transparent_62%)] blur-xl" />
+      <div className="animate-ambient pointer-events-none absolute right-[6%] top-1/2 h-[58vmin] w-[58vmin] -translate-y-1/2 rounded-full bg-[radial-gradient(circle_at_center,rgba(226,201,151,0.16),transparent_62%)]" />
       <div
-        className="pointer-events-none absolute bottom-[8%] right-[42%] h-40 w-40 rounded-full bg-[radial-gradient(circle_at_center,rgba(196,164,124,0.12),transparent_65%)] blur-xl"
+        className="pointer-events-none absolute bottom-[8%] right-[42%] h-40 w-40 rounded-full bg-[radial-gradient(circle_at_center,rgba(196,164,124,0.12),transparent_65%)]"
         style={{ animationDelay: '-4s' }}
       />
 
-      <div className="absolute inset-y-0 right-0 w-full bg-gradient-to-l from-obsidian via-obsidian/[0.78] to-transparent sm:w-[74%]" />
+      <div className="absolute inset-y-0 right-0 w-full bg-gradient-to-l from-obsidian via-obsidian/[0.82] to-transparent sm:w-[74%]" />
       <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-obsidian via-obsidian/40 to-transparent" />
 
-      <div className="container-lux relative flex h-full flex-col justify-center">
+      <div className="container-lux relative flex h-full flex-1 flex-col justify-end py-16 md:justify-center md:py-0">
         <div className="max-w-2xl">
-          <span className="animate-fade-up inline-flex items-center gap-3 rounded-full border border-gold/20 bg-gold/[0.07] px-4 py-2 backdrop-blur-md">
+          <span className="animate-fade-up inline-flex items-center gap-3 rounded-full border border-gold/20 bg-gold/[0.07] px-4 py-2">
             <span className="h-px w-5 bg-gold shadow-[0_0_8px_rgba(226,201,151,0.6)]" />
             <span className="font-serif text-[10px] font-semibold uppercase tracking-widest2 text-gold">
               {content.hero.eyebrow}
@@ -60,7 +63,7 @@ export const Hero = () => {
           </span>
 
           <h1
-            className="animate-fade-up mt-7 text-balance text-4xl font-extrabold leading-[1.25] text-pearl sm:text-5xl md:text-[62px] md:leading-[1.22]"
+            className="animate-fade-up mt-6 text-balance text-4xl font-extrabold leading-[1.25] text-pearl sm:text-5xl md:mt-7 md:text-[62px] md:leading-[1.22]"
             style={{ animationDelay: '120ms' }}
           >
             {content.hero.title1}
@@ -69,28 +72,28 @@ export const Hero = () => {
           </h1>
 
           <p
-            className="animate-fade-up mt-6 max-w-xl text-base leading-8 text-taupe md:text-lg"
+            className="animate-fade-up mt-5 max-w-xl text-base leading-8 text-taupe md:mt-6 md:text-lg"
             style={{ animationDelay: '240ms' }}
           >
             {content.hero.subtitle}
           </p>
 
           <div
-            className="animate-fade-up mt-9 flex flex-wrap items-center gap-4"
+            className="animate-fade-up mt-7 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4 md:mt-9"
             style={{ animationDelay: '360ms' }}
           >
-            <a href="#collection" className="btn-gold animate-float">
+            <a href="#collection" className="btn-gold animate-float w-full min-h-12 sm:w-auto">
               {content.hero.ctaPrimary}
               <ArrowDown size={17} strokeWidth={2} aria-hidden />
             </a>
-            <a href="#lookbook" className="btn-outline">
+            <a href="#lookbook" className="btn-outline w-full min-h-12 sm:w-auto">
               {content.hero.ctaSecondary}
             </a>
           </div>
         </div>
       </div>
 
-      <div className="container-lux absolute inset-x-0 bottom-7 flex items-center justify-between">
+      <div className="container-lux absolute inset-x-0 bottom-7 z-10 hidden items-center justify-between md:flex">
         <div className="flex items-center gap-2.5">
           {SLIDES.map((_, i) => (
             <button
