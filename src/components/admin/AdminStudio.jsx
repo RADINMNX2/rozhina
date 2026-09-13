@@ -475,7 +475,7 @@ const ProductEditor = ({ product, onClose, onSave }) => {
             type="button"
             aria-label="بستن"
             onClick={onClose}
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] text-pearl/70 transition-all duration-300 hover:rotate-90 hover:border-gold/40 hover:bg-gold/10 hover:text-gold active:scale-90"
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] text-pearl/70 transition-[transform,background-color,border-color,color] duration-300 hover:rotate-90 hover:border-gold/40 hover:bg-gold/10 hover:text-gold active:scale-90"
           >
             <X size={16} strokeWidth={1.8} />
           </button>
@@ -548,7 +548,7 @@ const ProductEditor = ({ product, onClose, onSave }) => {
                     set('inStock', !draft.inStock);
                     if (!draft.inStock && draft.quantity === '0') set('quantity', '1');
                   }}
-                  className={`flex h-full shrink-0 items-center gap-1.5 rounded-full border px-3 py-2.5 text-[11px] font-bold transition-all ${
+                  className={`flex h-full shrink-0 items-center gap-1.5 rounded-full border px-3 py-2.5 text-[11px] font-bold transition-[transform,background-color,border-color,color] ${
                     draft.inStock
                       ? 'border-gold/40 bg-gold/10 text-gold'
                       : 'border-terracotta/40 bg-terracotta/10 text-[#F0A888]'
@@ -739,7 +739,7 @@ const ProductEditor = ({ product, onClose, onSave }) => {
                     key={b}
                     type="button"
                     onClick={() => toggleBadge(b)}
-                    className={`rounded-full px-3.5 py-1.5 text-[11px] font-bold transition-all active:scale-95 ${
+                    className={`rounded-full px-3.5 py-1.5 text-[11px] font-bold transition-[transform,background-color,border-color,color] active:scale-95 ${
                       on
                         ? 'bg-gradient-to-b from-gold to-bronze text-obsidian shadow-gold-cta'
                         : 'border border-white/10 text-pearl/60 hover:border-gold/40 hover:text-pearl'
@@ -865,7 +865,7 @@ const ConfirmDialog = ({ title, message, confirmLabel = 'تأیید شود', onC
           <button
             type="button"
             onClick={onConfirm}
-            className="flex flex-1 items-center justify-center gap-2 rounded-full bg-gradient-to-b from-[#D4603F] to-[#A03F22] px-5 py-2.5 text-xs font-extrabold text-[#FFE8DD] shadow-[0_14px_36px_-14px_rgba(188,88,64,0.9)] transition-all duration-300 hover:-translate-y-0.5 active:scale-[0.97]"
+            className="flex flex-1 items-center justify-center gap-2 rounded-full bg-gradient-to-b from-[#D4603F] to-[#A03F22] px-5 py-2.5 text-xs font-extrabold text-[#FFE8DD] shadow-[0_14px_36px_-14px_rgba(188,88,64,0.9)] transition-[transform,background-color,border-color,color] duration-300 hover:-translate-y-0.5 active:scale-[0.97]"
           >
             <Trash2 size={13} strokeWidth={2.2} />
             {confirmLabel}
@@ -987,7 +987,7 @@ const ProductsTab = ({ pushRef }) => {
                       const nq = Math.max(0, (Number(p.quantity) || 0) - 1);
                       updateProduct(p.id, { quantity: nq, inStock: nq > 0 });
                     }}
-                    className="flex h-6 w-6 items-center justify-center rounded-full border border-white/10 text-pearl/70 transition-all hover:border-terracotta/50 hover:text-terracotta active:scale-90"
+                    className="flex h-6 w-6 items-center justify-center rounded-full border border-white/10 text-pearl/70 transition-[transform,background-color,border-color,color] hover:border-terracotta/50 hover:text-terracotta active:scale-90"
                   >
                     −
                   </button>
@@ -998,7 +998,7 @@ const ProductsTab = ({ pushRef }) => {
                       const nq = Math.min(99, (Number(p.quantity) || 0) + 1);
                       updateProduct(p.id, { quantity: nq, inStock: nq > 0 });
                     }}
-                    className="flex h-6 w-6 items-center justify-center rounded-full border border-white/10 text-pearl/70 transition-all hover:border-gold/40 hover:text-gold active:scale-90"
+                    className="flex h-6 w-6 items-center justify-center rounded-full border border-white/10 text-pearl/70 transition-[transform,background-color,border-color,color] hover:border-gold/40 hover:text-gold active:scale-90"
                   >
                     +
                   </button>
@@ -1019,7 +1019,7 @@ const ProductsTab = ({ pushRef }) => {
                 type="button"
                 aria-label={`حذف ${p.name}`}
                 onClick={() => setToDelete(p)}
-                className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 text-taupe/60 transition-all hover:border-terracotta/50 hover:text-terracotta active:scale-90"
+                className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 text-taupe/60 transition-[transform,background-color,border-color,color] hover:border-terracotta/50 hover:text-terracotta active:scale-90"
               >
                 <Trash2 size={13} strokeWidth={1.8} />
               </button>
@@ -1304,7 +1304,7 @@ const CListEditor = ({ items, onList, fields, imageKey }) => {
       <button
         type="button"
         onClick={() => onList([...items, {}])}
-        className="flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-white/15 px-4 py-2.5 text-[11px] font-bold text-pearl/60 transition-all duration-300 hover:border-gold/40 hover:text-gold active:scale-[0.99]"
+        className="flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-white/15 px-4 py-2.5 text-[11px] font-bold text-pearl/60 transition-[transform,background-color,border-color,color] duration-300 hover:border-gold/40 hover:text-gold active:scale-[0.99]"
       >
         <Plus size={12} strokeWidth={2.2} />
         افزودن مورد جدید
@@ -1941,7 +1941,7 @@ export const AdminStudio = () => {
                   type="button"
                   aria-label="بستن پنل مدیریت"
                   onClick={closeAdmin}
-                  className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 text-pearl/70 transition-all duration-300 hover:rotate-90 hover:border-gold/40 hover:text-gold active:scale-90"
+                  className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 text-pearl/70 transition-[transform,background-color,border-color,color] duration-300 hover:rotate-90 hover:border-gold/40 hover:text-gold active:scale-90"
                 >
                   <X size={18} strokeWidth={1.8} />
                 </button>
@@ -1964,7 +1964,7 @@ export const AdminStudio = () => {
                           role="tab"
                           aria-selected={active}
                           onClick={() => setTab(t.key)}
-                          className={`flex shrink-0 items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold transition-all duration-300 active:scale-[0.97] ${
+                          className={`flex shrink-0 items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-bold transition-[transform,background-color,border-color,color] duration-300 active:scale-[0.97] ${
                             active
                               ? 'bg-gradient-to-b from-gold to-bronze text-obsidian shadow-gold-cta'
                               : 'text-pearl/60 hover:bg-white/[0.04] hover:text-pearl'
