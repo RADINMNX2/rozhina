@@ -78,7 +78,7 @@ export const Header = ({ onOpenCart, onOpenSearch }) => {
               </IconButton>
             </div>
 
-            <a href="#home" className="absolute start-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+            <a href="#home" className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
               <Logo compact />
             </a>
 
