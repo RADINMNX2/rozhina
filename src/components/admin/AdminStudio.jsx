@@ -214,10 +214,10 @@ const Field = ({ label, hint, children }) => (
 const TextInput = (props) => <input {...props} className="lux-input !py-2.5 text-sm" />;
 
 const PILL_BTN =
-  'inline-flex items-center justify-center gap-2 rounded-full border px-4 py-2.5 text-xs font-bold transition-all duration-300 active:scale-[0.97]';
+  'inline-flex items-center justify-center gap-2 rounded-full border px-4 py-2.5 text-xs font-bold transition-[transform,background-color,border-color,color] duration-300 active:scale-[0.97]';
 
 const Panel = ({ title, icon: Icon, children, actions }) => (
-  <div className="rounded-2xl border border-white/[0.07] bg-white/[0.02] p-5 backdrop-blur-xl">
+  <div className="rounded-2xl border border-white/[0.07] bg-white/[0.02] p-5">
     <div className="mb-4 flex items-center justify-between gap-3">
       <h3 className="flex items-center gap-2 text-sm font-bold text-pearl">
         {Icon && <Icon size={15} className="text-gold" strokeWidth={1.7} />}
@@ -240,7 +240,7 @@ const ToastHost = ({ toasts }) => (
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -10, scale: 0.95 }}
           transition={{ type: 'spring', damping: 24, stiffness: 320 }}
-          className={`pointer-events-auto flex items-center gap-2.5 rounded-full border px-5 py-3 text-xs font-bold shadow-[0_14px_40px_-12px_rgba(0,0,0,0.7)] backdrop-blur-xl ${
+          className={`pointer-events-auto flex items-center gap-2.5 rounded-full border px-5 py-3 text-xs font-bold shadow-[0_14px_40px_-12px_rgba(0,0,0,0.7)] ${
             t.type === 'error'
               ? 'border-terracotta/40 bg-[#24120F]/95 text-[#F0B8A0]'
               : 'border-gold/30 bg-[#141210]/95 text-gold'
@@ -448,7 +448,7 @@ const ProductEditor = ({ product, onClose, onSave }) => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="absolute inset-0 bg-obsidian/85 backdrop-blur-lg"
+        className="absolute inset-0 bg-obsidian/90"
       />
       <motion.div
         onClick={(e) => e.stopPropagation()}
@@ -803,7 +803,7 @@ const ProductEditor = ({ product, onClose, onSave }) => {
           )}
         </div>
 
-        <div className="relative z-10 flex shrink-0 items-center gap-2.5 border-t border-white/[0.06] bg-gradient-to-t from-[#0E0D0C] to-[#141312] px-5 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3 backdrop-blur-xl">
+        <div className="relative z-10 flex shrink-0 items-center gap-2.5 border-t border-white/[0.06] bg-gradient-to-t from-[#0E0D0C] to-[#141312] px-5 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3">
           <button
             type="button"
             onClick={onClose}
@@ -831,7 +831,7 @@ const ConfirmDialog = ({ title, message, confirmLabel = 'تأیید شود', onC
     initial={{ opacity: 0 }}
     animate={{ opacity: 1 }}
     exit={{ opacity: 0 }}
-    className="fixed inset-0 z-[97] flex items-end justify-center bg-obsidian/85 p-0 backdrop-blur-md sm:items-center sm:p-4"
+    className="fixed inset-0 z-[97] flex items-end justify-center bg-obsidian/90 p-0 sm:items-center sm:p-4"
     onClick={onCancel}
   >
     <motion.div
@@ -941,7 +941,7 @@ const ProductsTab = ({ pushRef }) => {
         {filtered.map((p) => (
           <li
             key={p.id}
-            className="flex flex-col gap-3 rounded-2xl border border-white/[0.06] bg-white/[0.02] p-3.5 backdrop-blur-xl transition-colors hover:border-gold/20 sm:flex-row sm:items-center"
+            className="flex flex-col gap-3 rounded-2xl border border-white/[0.06] bg-white/[0.02] p-3.5 transition-colors hover:border-gold/20 sm:flex-row sm:items-center"
           >
             <span className="relative h-20 w-14 shrink-0 self-start overflow-hidden rounded-lg border border-white/[0.07] bg-white/[0.03]">
               <img
@@ -1918,7 +1918,7 @@ export const AdminStudio = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.25 }}
-            className="fixed inset-0 z-[85] overflow-y-auto bg-[#0C0B0A]/97 backdrop-blur-2xl"
+            className="fixed inset-0 z-[85] overflow-y-auto bg-[#0C0B0A]/97"
             role="dialog"
             aria-label="پنل مدیریت روژینا"
           >
@@ -1950,7 +1950,7 @@ export const AdminStudio = () => {
               {unlocked ? (
                 <>
                   <div
-                    className="no-scrollbar mt-6 flex items-center gap-1.5 overflow-x-auto rounded-2xl border border-white/[0.07] bg-white/[0.02] p-1.5 backdrop-blur-xl"
+                    className="no-scrollbar mt-6 flex items-center gap-1.5 overflow-x-auto rounded-2xl border border-white/[0.07] bg-white/[0.02] p-1.5"
                     role="tablist"
                     aria-label="بخش‌های پنل مدیریت"
                   >
