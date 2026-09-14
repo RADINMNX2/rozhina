@@ -58,6 +58,8 @@ export const CursorGlow = () => {
       <motion.div
         className="absolute rounded-full will-change-transform"
         style={{
+          left: 0,
+          top: 0,
           width: MAIN,
           height: MAIN,
           x: mainX,
@@ -72,6 +74,8 @@ export const CursorGlow = () => {
       <motion.div
         className="absolute rounded-full will-change-transform"
         style={{
+          left: 0,
+          top: 0,
           width: ECHO,
           height: ECHO,
           x: echoX,

@@ -42,8 +42,6 @@ export default function App() {
     return () => window.removeEventListener('hashchange', onHash);
   }, []);
 
-  if (route === 'admin') return <AdminStudio />;
-
   const products = useMemo(() => {
     let list = [...allProducts];
 
@@ -74,6 +72,8 @@ export default function App() {
     setColor(null);
     document.getElementById('collection')?.scrollIntoView({ behavior: 'smooth' });
   };
+
+  if (route === 'admin') return <AdminStudio />;
 
   return (
     <div className="min-h-screen bg-obsidian">
