@@ -12,6 +12,8 @@ const SPRING = { type: 'spring', damping: 30, stiffness: 300, mass: 0.9 };
 export const FilterSheet = ({
   open,
   onClose,
+  category,
+  setCategory,
   fabric,
   setFabric,
   color,
@@ -73,6 +75,8 @@ export const FilterSheet = ({
             <div className="modal-body py-5">
               <FilterSection
                 variant="panel"
+                category={category}
+                setCategory={setCategory}
                 fabric={fabric}
                 setFabric={setFabric}
                 color={color}

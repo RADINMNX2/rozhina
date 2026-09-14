@@ -16,7 +16,7 @@ import { AdminStudio } from './components/admin/AdminStudio';
 import { useProducts } from './context/ProductsContext';
 
 const getSearchKey = (product) =>
-  `${product.name} ${product.enName} ${product.fabric}`.toLowerCase();
+  `${product.name} ${product.enName} ${product.fabric} ${product.category}`.toLowerCase();
 
 const getRoute = () => (window.location.hash === '#/admin' || window.location.hash === '#admin' ? 'admin' : 'home');
 
@@ -27,6 +27,7 @@ export default function App() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [fabric, setFabric] = useState('همه');
   const [color, setColor] = useState(null);
+  const [category, setCategory] = useState('همه');
   const [sort, setSort] = useState('featured');
   const [search, setSearch] = useState('');
   const [quickView, setQuickView] = useState(null);
@@ -45,6 +46,7 @@ export default function App() {
   const products = useMemo(() => {
     let list = [...allProducts];
 
+    if (category !== 'همه') list = list.filter((p) => p.category === category);
     if (fabric !== 'همه') list = list.filter((p) => p.fabric === fabric);
     if (color) list = list.filter((p) => p.colors.some((c) => c.hex === color));
 
@@ -62,10 +64,11 @@ export default function App() {
         list.sort((a, b) => Number(Boolean(b.badges.length)) - Number(Boolean(a.badges.length)));
     }
     return list;
-  }, [allProducts, fabric, color, sort, search]);
+  }, [allProducts, category, fabric, color, sort, search]);
 
   const handleSearchSelect = (product) => {
     setSearch(product.name);
+    setCategory('همه');
     setFabric('همه');
     setColor(null);
     document.getElementById('collection')?.scrollIntoView({ behavior: 'smooth' });
@@ -81,6 +84,8 @@ export default function App() {
         <FeaturesBand />
         <CollectionSection
           products={products}
+          category={category}
+          setCategory={setCategory}
           fabric={fabric}
           setFabric={setFabric}
           color={color}

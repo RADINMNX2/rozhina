@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
-import { Check, RotateCcw, SlidersHorizontal } from 'lucide-react';
-import { COLORS } from '../data/productsData';
+import { Check, LayoutGrid, RotateCcw, SlidersHorizontal } from 'lucide-react';
+import { COLORS, CATEGORIES } from '../data/productsData';
 import { useProducts } from '../context/ProductsContext';
 import { toFa } from '../utils/format';
 
@@ -12,6 +12,8 @@ export const SORTS = [
 
 export const FilterSection = ({
   variant = 'row',
+  category,
+  setCategory,
   fabric,
   setFabric,
   color,
@@ -21,6 +23,8 @@ export const FilterSection = ({
   count,
 }) => {
   const { products } = useProducts();
+
+  const categoryList = ['همه', ...CATEGORIES];
 
   const fabrics = useMemo(() => {
     const seen = new Set();
@@ -37,13 +41,38 @@ export const FilterSection = ({
 
   const fabricList = ['همه', ...fabrics];
   const reset = () => {
+    setCategory('همه');
     setFabric('همه');
     setColor(null);
   };
 
+  const categoryChipClass = (active) => active
+    ? 'border-gold/35 bg-gold/10 text-gold'
+    : 'border-white/10 text-pearl/65 hover:border-gold/30 hover:text-pearl';
+
   if (variant === 'panel') {
     return (
       <div className="flex flex-col gap-6">
+        <div>
+          <span className="flex items-center gap-2 text-[11px] font-bold tracking-wide text-taupe">
+            <LayoutGrid size={13} strokeWidth={1.8} className="text-gold" />
+            دسته‌بندی
+          </span>
+          <div className="mt-3 flex flex-wrap gap-1.5">
+            {categoryList.map((c) => (
+              <button
+                key={c}
+                type="button"
+                onClick={() => setCategory(c)}
+                aria-pressed={category === c}
+                className={`focus-ring min-h-11 rounded-xl border px-4 text-[13px] font-medium transition-[transform,background-color,border-color,color] duration-300 active:scale-[0.99] ${categoryChipClass(category === c)}`}
+              >
+                {c}
+              </button>
+            ))}
+          </div>
+        </div>
+
         <div>
           <span className="flex items-center gap-2 text-[11px] font-bold tracking-wide text-taupe">
             <SlidersHorizontal size={13} strokeWidth={1.8} className="text-gold" />
@@ -130,6 +159,25 @@ export const FilterSection = ({
   }
 
   return (
+    <div className="flex flex-col gap-4">
+      <div className="no-scrollbar -mx-4 flex items-center gap-2 overflow-x-auto px-4 pb-1" role="group" aria-label="دسته‌بندی">
+        {categoryList.map((c) => (
+          <button
+            key={c}
+            type="button"
+            onClick={() => setCategory(c)}
+            aria-pressed={category === c}
+            className={`whitespace-nowrap rounded-full border px-5 py-2.5 text-[13px] font-medium transition-[transform,box-shadow,border-color,background-color] duration-300 active:scale-[0.97] focus-ring ${
+              category === c
+                ? 'border-gold/35 bg-gold/10 text-gold shadow-[0_8px_24px_-8px_rgba(226,201,151,0.45)]'
+                : 'border-white/10 bg-transparent text-pearl/60 hover:border-gold/40 hover:text-pearl'
+            }`}
+          >
+            {c}
+          </button>
+        ))}
+      </div>
+
     <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
       <div className="no-scrollbar -mx-4 flex items-center gap-2 overflow-x-auto px-4 pb-1">
         {fabricList.map((f) => (
@@ -203,6 +251,7 @@ export const FilterSection = ({
             </select>
           </div>
         </div>
+      </div>
       </div>
     </div>
   );

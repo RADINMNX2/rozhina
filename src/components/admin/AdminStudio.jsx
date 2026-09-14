@@ -26,6 +26,7 @@ import { useSettings } from '../../context/SettingsContext';
 import { useContent } from '../../context/ContentContext';
 import { formatPrice, toFa } from '../../utils/format';
 import { remoteReadyFlag, whenRemoteReady } from '../../utils/remote';
+import { CATEGORIES } from '../../data/productsData';
 
 const ADMIN_PIN = 'Rozhina8962';
 
@@ -89,6 +90,19 @@ const serializeFabrics = (products) => {
   return list;
 };
 
+const serializeCategories = (products) => {
+  const seen = new Set(['شال و روسری', 'کیف و اکسسوری', 'لباس', 'شلوار']);
+  const list = [];
+  for (const p of products) {
+    const c = (p.category || '').trim();
+    if (c && !seen.has(c)) {
+      seen.add(c);
+      list.push(c);
+    }
+  }
+  return list;
+};
+
 export const serializeProducts = (products) => {
   const body = products
     .map((p) => {
@@ -104,6 +118,7 @@ export const serializeProducts = (products) => {
         `    name: ${q(p.name)},`,
         `    enName: ${q(p.enName)},`,
         `    code: ${q(p.code)},`,
+        `    category: ${q(p.category)},`,
         `    fabric: ${q(p.fabric)},`,
         `    dimensions: ${q(p.dimensions)},`,
         `    ${colors},`,
@@ -120,11 +135,14 @@ export const serializeProducts = (products) => {
 
   const fabricsList = serializeFabrics(products);
   const colorsList = serializeColors(products);
+  const categoriesList = serializeCategories(products);
 
   return [
     "const photo = (id) => `https://images.unsplash.com/${id}?auto=format&fit=crop&w=900&q=80`;",
     '',
     "export const PLACEHOLDER_IMAGE = photo('photo-1520006403909-838d6b92c22e');",
+    '',
+    `export const CATEGORIES = ${JSON.stringify(categoriesList, null, 2)};`,
     '',
     `export const FABRICS = ${JSON.stringify(fabricsList, null, 2)};`,
     '',
@@ -323,6 +341,7 @@ const EMPTY_DRAFT = {
   name: '',
   enName: '',
   code: '',
+  category: 'شال و روسری',
   fabric: '',
   dimensions: '',
   price: '',
@@ -381,6 +400,7 @@ const ProductEditor = ({ product, onClose, onSave }) => {
           name: product.name,
           enName: product.enName,
           code: product.code ?? '',
+          category: product.category ?? 'شال و روسری',
           fabric: product.fabric,
           dimensions: product.dimensions,
           price: String(product.price ?? ''),
@@ -420,6 +440,7 @@ const ProductEditor = ({ product, onClose, onSave }) => {
       name: draft.name.trim(),
       enName: draft.enName.trim(),
       code: draft.code.trim(),
+      category: draft.category,
       fabric: draft.fabric.trim() || 'ابریشم',
       dimensions: draft.dimensions.trim(),
       price: Number(draft.price) || 0,
@@ -509,17 +530,31 @@ const ProductEditor = ({ product, onClose, onSave }) => {
             </Field>
           </div>
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
+            <Field label="دسته‌بندی">
+              <select
+                value={draft.category}
+                onChange={(e) => set('category', e.target.value)}
+                className="lux-input appearance-none !py-2.5"
+                dir="rtl"
+              >
+                {CATEGORIES.map((c) => (
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
+                ))}
+              </select>
+            </Field>
             <Field label="جنس پارچه">
               <TextInput
                 list="admin-fabrics"
                 value={draft.fabric}
                 onChange={(e) => set('fabric', e.target.value)}
-                placeholder="ابریشم، موهر…"
+                placeholder="ابریشم، چرم، کتان…"
                 dir="rtl"
               />
               <datalist id="admin-fabrics">
-                {['ابریشم', 'ابریشم ژاکارد', 'نخ ابریشم', 'کشمیر و موهر', 'نخ لنین', 'کرپ حریر', 'موهر', 'نخی'].map((f) => (
+                {['ابریشم', 'ابریشم ژاکارد', 'نخ ابریشم', 'کشمیر و موهر', 'نخ لنین', 'کرپ حریر', 'موهر', 'نخی', 'چرم', 'کتان', 'جین', 'مخمل'].map((f) => (
                   <option key={f} value={f} />
                 ))}
               </datalist>
@@ -880,31 +915,53 @@ const ConfirmDialog = ({ title, message, confirmLabel = 'تأیید شود', onC
 const ProductsTab = ({ pushRef }) => {
   const { products, addProduct, updateProduct, deleteProduct, resetToDefaults } = useProducts();
   const [query, setQuery] = useState('');
+  const [cat, setCat] = useState('همه');
   const [editor, setEditor] = useState(null);
   const [toDelete, setToDelete] = useState(null);
 
   const filtered = useMemo(() => {
+    let list = products;
     const qText = query.trim().toLowerCase();
-    if (!qText) return products;
-    return products.filter(
-      (p) =>
-        p.name.toLowerCase().includes(qText) ||
-        (p.enName || '').toLowerCase().includes(qText) ||
-        (p.fabric || '').toLowerCase().includes(qText),
-    );
-  }, [products, query]);
+    if (qText) {
+      list = list.filter(
+        (p) =>
+          p.name.toLowerCase().includes(qText) ||
+          (p.enName || '').toLowerCase().includes(qText) ||
+          (p.fabric || '').toLowerCase().includes(qText) ||
+          (p.category || '').toLowerCase().includes(qText),
+      );
+    }
+    if (cat !== 'همه') list = list.filter((p) => p.category === cat);
+    return list;
+  }, [products, query, cat]);
 
   return (
     <div className="space-y-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="relative w-full sm:max-w-xs">
-          <input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="جستجو در محصولات…"
-            className="lux-input !py-2.5 text-sm"
+        <div className="flex w-full flex-col gap-2 sm:max-w-md sm:flex-row">
+          <div className="relative flex-1">
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="جستجو در محصولات…"
+              className="lux-input !py-2.5 text-sm"
+              dir="rtl"
+            />
+          </div>
+          <select
+            value={cat}
+            onChange={(e) => setCat(e.target.value)}
+            className="lux-input appearance-none !py-2.5 text-sm"
             dir="rtl"
-          />
+            aria-label="فیلتر دسته‌بندی"
+          >
+            <option value="همه">همه دسته‌ها</option>
+            {CATEGORIES.map((c) => (
+              <option key={c} value={c}>
+                {c}
+              </option>
+            ))}
+          </select>
         </div>
         <div className="flex items-center gap-2.5">
           <span className="whitespace-nowrap text-xs text-taupe">{toFa(products.length)} محصول</span>
@@ -960,6 +1017,11 @@ className={`${PILL_BTN} whitespace-nowrap border-white/10 text-pearl/60 hover:bo
                     {b}
                   </span>
                 ))}
+                {p.category && (
+                  <span className="whitespace-nowrap rounded-full bg-white/[0.05] px-2 py-0.5 text-[9px] font-bold text-pearl/50">
+                    {p.category}
+                  </span>
+                )}
               </div>
               <p className="mt-1 text-[11px] text-taupe" dir="ltr">
                 {p.enName}

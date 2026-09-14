@@ -5,9 +5,12 @@ import { FilterSheet } from './FilterSheet';
 import { ProductGrid } from './ProductGrid';
 import { Reveal } from './motion/Reveal';
 import { useContent } from '../context/ContentContext';
+import { CATEGORIES } from '../data/productsData';
 
 export const CollectionSection = ({
   products,
+  category,
+  setCategory,
   fabric,
   setFabric,
   color,
@@ -18,7 +21,7 @@ export const CollectionSection = ({
 }) => {
   const { content } = useContent();
   const [sheetOpen, setSheetOpen] = useState(false);
-  const filtersActive = fabric !== 'همه' || !!color;
+  const filtersActive = category !== 'همه' || fabric !== 'همه' || !!color;
 
   return (
     <section id="collection" className="relative scroll-mt-20 py-16 md:py-24">
@@ -40,8 +43,26 @@ export const CollectionSection = ({
           </div>
         </Reveal>
 
-        {/* Mobile / tablet: compact control bar */}
-        <div className="mt-10 flex items-center justify-between gap-3 md:mt-12 lg:hidden">
+        {/* Mobile / tablet: category chips + compact control bar */}
+        <div className="no-scrollbar -mx-4 mt-9 flex items-center gap-2 overflow-x-auto px-4 lg:hidden" role="group" aria-label="دسته‌بندی">
+          {['همه', ...CATEGORIES].map((c) => (
+            <button
+              key={c}
+              type="button"
+              onClick={() => setCategory(c)}
+              aria-pressed={category === c}
+              className={`focus-ring whitespace-nowrap rounded-full border px-4 py-2 text-xs font-bold transition-[transform,box-shadow,border-color,background-color] duration-300 active:scale-[0.96] ${
+                category === c
+                  ? 'border-gold/40 bg-gold/10 text-gold shadow-[0_8px_24px_-8px_rgba(226,201,151,0.45)]'
+                  : 'border-white/10 text-pearl/60 hover:border-gold/30 hover:text-pearl'
+              }`}
+            >
+              {c}
+            </button>
+          ))}
+        </div>
+
+        <div className="mt-6 flex items-center justify-between gap-3 lg:hidden">
           <button
             type="button"
             onClick={() => setSheetOpen(true)}
@@ -80,6 +101,8 @@ export const CollectionSection = ({
             <div className="rounded-3xl border border-white/[0.07] bg-white/[0.02] p-6 transition-[border-color] duration-300 hover:border-gold/20">
               <FilterSection
                 variant="panel"
+                category={category}
+                setCategory={setCategory}
                 fabric={fabric}
                 setFabric={setFabric}
                 color={color}
@@ -99,6 +122,8 @@ export const CollectionSection = ({
         <FilterSheet
           open={sheetOpen}
           onClose={() => setSheetOpen(false)}
+          category={category}
+          setCategory={setCategory}
           fabric={fabric}
           setFabric={setFabric}
           color={color}

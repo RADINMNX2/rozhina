@@ -10,7 +10,7 @@ export const Logo = ({ compact = false }) => (
     <span className={`flex items-center gap-2 ${compact ? 'hidden sm:flex' : ''}`}>
       <span className="h-px w-6 bg-gradient-to-r from-transparent to-gold/60" />
       <span className="font-serif text-[8px] font-semibold uppercase tracking-[0.42em] text-gold/85 drop-shadow-[0_0_10px_rgba(226,201,151,0.35)] md:text-[9px]">
-        Boutique Scarf
+        Boutique
       </span>
       <span className="h-px w-6 bg-gradient-to-l from-transparent to-gold/60" />
     </span>
