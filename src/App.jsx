@@ -12,6 +12,7 @@ import { SearchOverlay } from './components/SearchOverlay';
 import { FloatingWhatsApp } from './components/FloatingWhatsApp';
 import { ProductQuickViewModal } from './components/ProductQuickViewModal';
 import { CartToast } from './components/CartToast';
+import { CursorGlow } from './components/CursorGlow';
 import { AdminStudio } from './components/admin/AdminStudio';
 import { useProducts } from './context/ProductsContext';
 
@@ -109,6 +110,7 @@ export default function App() {
       <FloatingWhatsApp />
       <ProductQuickViewModal product={quickView} onClose={() => setQuickView(null)} />
       <CartToast />
+      <CursorGlow />
     </div>
   );
 }
