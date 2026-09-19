@@ -2,18 +2,38 @@ const photo = (id) => `https://images.unsplash.com/${id}?auto=format&fit=crop&w=
 
 export const PLACEHOLDER_IMAGE = photo('photo-1520006403909-838d6b92c22e');
 
+export const CATEGORIES = [];
+
 export const FABRICS = [
-  "ابریشم"
+  "ابریشم",
+  "کشمیر و موهر",
+  "چرم",
+  "کرپ حریر",
+  "نخ لنین"
 ];
 
 export const COLORS = [
   {
     label: "کلاسیک",
     hex: "#E2C997"
+  },
+  {
+    label: "زمردی",
+    hex: "#1F4D3A"
+  },
+  {
+    label: "قهوه‌ای",
+    hex: "#6B4A2F"
+  },
+  {
+    label: "شب",
+    hex: "#1A1A2E"
+  },
+  {
+    label: "شنی",
+    hex: "#D8CBB8"
   }
 ];
-
-export const CATEGORIES = ['شال و روسری', 'کیف و اکسسوری', 'لباس', 'شلوار'];
 
 const BADGE_STYLES = {
   'دست‌دوز': 'bg-gold text-espresso',
@@ -36,7 +56,7 @@ export const PRODUCTS = [
     colors: [{ label: "کلاسیک", hex: "#E2C997" }],
     price: 4750000,
     oldPrice: 5000000,
-    quantity: 7,
+    quantity: 0,
     badges: ["کالکشن جدید"],
     description: "شال ابریشم توییل کیفیت بشدت خوب.",
     images: [photo("photo-1520006403909-838d6b92c22e")],
@@ -52,7 +72,7 @@ export const PRODUCTS = [
     colors: [{ label: "زمردی", hex: "#1F4D3A" }],
     price: 5200000,
     oldPrice: null,
-    quantity: 5,
+    quantity: 0,
     badges: ["دست‌دوز"],
     description: "شال کشمیر پاییزه با بافت نرم و گرم برای روزهای سرد.",
     images: [photo("photo-1539109136881-3be0616acf4b")],
@@ -68,7 +88,7 @@ export const PRODUCTS = [
     colors: [{ label: "قهوه‌ای", hex: "#6B4A2F" }],
     price: 6800000,
     oldPrice: 7200000,
-    quantity: 3,
+    quantity: 0,
     badges: ["تعداد محدود"],
     description: "کیف چرم طبیعی با دوخت دست و یراق‌آلات طلایی.",
     images: [photo("photo-1548036328-c9fa89d128fa")],
@@ -84,7 +104,7 @@ export const PRODUCTS = [
     colors: [{ label: "شب", hex: "#1A1A2E" }],
     price: 8900000,
     oldPrice: null,
-    quantity: 2,
+    quantity: 0,
     badges: ["کالکشن جدید"],
     description: "پیراهن مجلسی از حریر طبیعی با برش ظریف و دامن پلیسه.",
     images: [photo("photo-1566174053879-31528523f8ae")],
@@ -100,7 +120,7 @@ export const PRODUCTS = [
     colors: [{ label: "شنی", hex: "#D8CBB8" }],
     price: 3900000,
     oldPrice: 4300000,
-    quantity: 6,
+    quantity: 0,
     badges: [],
     description: "شلوار کتان با خط اتو و دوخت تمیز؛ انتخابی برای استایل روزمره.",
     images: [photo("photo-1473966968600-fa801b869a1a")],
